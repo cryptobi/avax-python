@@ -1,0 +1,2 @@
+avmusername=USERNAME
+avmpassword=PASSWORD
