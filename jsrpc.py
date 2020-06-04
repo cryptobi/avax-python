@@ -9,7 +9,7 @@ import json
 import random
 
 
-def ava_call(url, method, params):
+def ava_call(url, method, params=None):
 
     payload = {
         "method": method,
@@ -25,3 +25,7 @@ def ava_call(url, method, params):
         return
 
     return response["result"]
+
+
+def ava_post(url, params=None):
+    return requests.post(url, params)

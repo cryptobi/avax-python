@@ -8,11 +8,15 @@ jsonrpc_prot = "http"
 jsonrpc_url = "{}://{}:{}".format(jsonrpc_prot, jsonrpc_host, jsonrpc_port)
 
 xurl = "{}/ext/bc/X".format(jsonrpc_url)  # x-chain url
+murl = "{}/ext/metrics".format(jsonrpc_url)  # metrics url
+turl = "{}/ext/timestamp".format(jsonrpc_url)  # timestamp url
 purl = "{}/ext/bc/P".format(jsonrpc_url)  # p-chain url
 kurl = "{}/ext/keystore".format(jsonrpc_url)  # keystore url
 aurl = "{}/ext/admin".format(jsonrpc_url)  # admin url
 iurl = "{}/ext/ipcs".format(jsonrpc_url)  # ipcs url
 hurl = "{}/ext/health".format(jsonrpc_url)  # health url
+eurl = "{}/ext/bc/C/rpc".format(jsonrpc_url)  # ethereum url
+weurl = "{}/ext/bc/C/ws".format(jsonrpc_url)  # websocket ethereum url
 
 
 def load_upass():

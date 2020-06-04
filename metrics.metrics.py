@@ -2,10 +2,8 @@
 # Author: https://github.com/zefonseca/
 # License MIT
 
-import ipcs
+import metrics
 import sys
 
-blockchainID = sys.argv[1]
-
-stt = ipcs.publishBlockchain(blockchainID)
+stt = metrics.metrics()
 print(stt)

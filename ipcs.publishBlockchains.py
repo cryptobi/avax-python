@@ -7,11 +7,11 @@
 import socket
 import sys
 import platform
-import ipc
+import ipcs
 
 blockchains = platform.getBlockchains()
 
 for bc in blockchains["blockchains"]:
 
-    ret = ipc.publishBlockchain(bc["id"])
+    ret = ipcs.publishBlockchain(bc["id"])
     print(ret)

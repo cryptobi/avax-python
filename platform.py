@@ -20,6 +20,28 @@ def getSubnets():
     return jsrpc.ava_call(avaconfig.purl, "platform.getSubnets", data)
 
 
+def createBlockchain(subnetID, vmID, name, payerNonce, genesisData):
+
+    data = {
+        "subnetID": subnetID,
+        "vmID": vmID,
+        "name": name,
+        "payerNonce": payerNonce,
+        "genesisData": genesisData
+    }
+
+    return jsrpc.ava_call(avaconfig.purl, "platform.createBlockchain", data)
+
+
+def getBlockchainStatus(blockchainID):
+
+    data = {
+        "blockchainID": blockchainID
+    }
+
+    return jsrpc.ava_call(avaconfig.purl, "platform.getBlockchainStatus", data)
+
+
 
 def importAVA(to_addr, nonce, usern, passw):
 
@@ -28,6 +50,17 @@ def importAVA(to_addr, nonce, usern, passw):
         "username": usern,
         "password": passw,
         "payerNonce": nonce
+    }
+
+    return jsrpc.ava_call(avaconfig.purl, "platform.importAVA", data)
+
+
+def exportAVA(amount, to, payerNonce):
+
+    data = {
+        "amount": amount,
+        "to": to,
+        "payerNonce": payerNonce
     }
 
     return jsrpc.ava_call(avaconfig.purl, "platform.importAVA", data)
@@ -67,6 +100,20 @@ def addDefaultSubnetValidator(host_id, nonce, dest_addr, start_time, end_time, a
     return jsrpc.ava_call(avaconfig.purl, "platform.addDefaultSubnetValidator", data)
 
 
+def addNonDefaultSubnetValidator(host_id, subnetID, startTime, endTime, weight, payerNonce):
+
+    data = {
+        "id": host_id,
+        "subnetID": subnetID,
+        "startTime": startTime,
+        "endTime": endTime,
+        "weight": int(weight),
+        "payerNonce": payerNonce
+    }
+
+    return jsrpc.ava_call(avaconfig.purl, "platform.addDefaultSubnetValidator", data)
+
+
 def sign(tx, signer_addr, usern, passw):
 
     data = {
@@ -99,6 +146,19 @@ def getCurrentValidators(subnetID=None):
     return jsrpc.ava_call(avaconfig.purl, "platform.getCurrentValidators", data)
 
 
+def sampleValidators(subnetID=None, size=50):
+
+    data = {
+        "subnetID": subnetID,
+        "size": size
+    }
+
+    if subnetID:
+        data["subnetID"] = subnetID
+
+    return jsrpc.ava_call(avaconfig.purl, "platform.sampleValidators", data)
+
+
 def validates(subnetID):
 
     data = {"subnetID": subnetID}
@@ -122,4 +182,16 @@ def createAccount(usern, passw):
     }
 
     return jsrpc.ava_call(avaconfig.purl, "platform.createAccount", data)
+
+
+def createSubnet(controlKeys, threshold, payerNonce):
+
+    data = {
+        "controlKeys": controlKeys,
+        "payerNonce": payerNonce,
+        "threshold": threshold
+    }
+
+    return jsrpc.ava_call(avaconfig.purl, "platform.createSubnet", data)
+
 
