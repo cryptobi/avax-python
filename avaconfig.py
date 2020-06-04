@@ -12,6 +12,7 @@ purl = "{}/ext/bc/P".format(jsonrpc_url)  # p-chain url
 kurl = "{}/ext/keystore".format(jsonrpc_url)  # keystore url
 aurl = "{}/ext/admin".format(jsonrpc_url)  # admin url
 iurl = "{}/ext/ipcs".format(jsonrpc_url)  # ipcs url
+hurl = "{}/ext/health".format(jsonrpc_url)  # health url
 
 
 def load_upass():
