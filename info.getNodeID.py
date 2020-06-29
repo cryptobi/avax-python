@@ -2,7 +2,7 @@
 # Author: https://github.com/zefonseca/
 # License MIT
 
-import admin
+import info
 
-stt = admin.getNodeID()
+stt = info.getNodeID()
 print(stt)

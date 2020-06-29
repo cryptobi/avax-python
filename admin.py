@@ -4,9 +4,12 @@
 
 import avaconfig
 import jsrpc
+import warnings
 
 
 def getNodeID():
+
+    warnings.warn("This method is deprecated and will be removed in future versions. Use info.getNodeID instead.", DeprecationWarning)
 
     data = {}
 
@@ -16,6 +19,8 @@ def getNodeID():
 
 def peers():
 
+    warnings.warn("This method is deprecated and will be removed in future versions. Use info.peers instead.", DeprecationWarning)
+
     data = {}
 
     ret = jsrpc.ava_call(avaconfig.aurl, "admin.peers", data)
@@ -23,6 +28,8 @@ def peers():
 
 
 def getNetworkID():
+
+    warnings.warn("This method is deprecated and will be removed in future versions. Use info.getNetworkID instead.", DeprecationWarning)
 
     data = {}
 
@@ -53,6 +60,8 @@ def aliasChain(chain, alias):
 
 
 def getBlockchainID(alias):
+
+    warnings.warn("This method is deprecated and will be removed in future versions. Use info API instead.", DeprecationWarning)
 
     data = {
         "alias": alias

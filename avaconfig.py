@@ -17,6 +17,7 @@ iurl = "{}/ext/ipcs".format(jsonrpc_url)  # ipcs url
 hurl = "{}/ext/health".format(jsonrpc_url)  # health url
 eurl = "{}/ext/bc/C/rpc".format(jsonrpc_url)  # ethereum url
 weurl = "{}/ext/bc/C/ws".format(jsonrpc_url)  # websocket ethereum url
+iurl = "{}/ext/info".format(jsonrpc_url)  # info API endpoint
 
 
 def load_upass():

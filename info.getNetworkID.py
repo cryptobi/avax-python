@@ -2,8 +2,8 @@
 # Author: https://github.com/zefonseca/
 # License MIT
 
-import admin
+import info
 
 
-stt = admin.peers()
+stt = info.getNetworkID()
 print(stt)
