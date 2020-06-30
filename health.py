@@ -2,14 +2,15 @@
 # Author: https://github.com/zefonseca/
 # License MIT
 
-import avaconfig
+import avapython
 import jsrpc
 
+caller = avapython.get_caller()
 
 def getLiveness():
 
     data = {}
 
-    ret = jsrpc.ava_call(avaconfig.hurl, "health.getLiveness", data)
+    ret = caller("health.getLiveness", data)
     return ret
 

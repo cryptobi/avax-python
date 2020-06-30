@@ -2,14 +2,16 @@
 # Author: https://github.com/zefonseca/
 # License MIT
 
-import avaconfig
+import avapython
 import jsrpc
+
+caller = avapython.get_caller()
 
 def listUsers():
 
     data = {}
 
-    return jsrpc.ava_call(avaconfig.kurl, "keystore.listUsers", data)
+    return caller("keystore.listUsers", data)
 
 
 def createUser(usern, passw):
@@ -19,7 +21,7 @@ def createUser(usern, passw):
         "password": passw
     }
 
-    return jsrpc.ava_call(avaconfig.kurl, "keystore.createUser", data)
+    return caller("keystore.createUser", data)
 
 
 def deleteUser(usern, passw):
@@ -29,7 +31,7 @@ def deleteUser(usern, passw):
         "password": passw
     }
 
-    return jsrpc.ava_call(avaconfig.kurl, "keystore.deleteUser", data)
+    return caller("keystore.deleteUser", data)
 
 
 def exportUser(usern, passw):
@@ -39,7 +41,7 @@ def exportUser(usern, passw):
         "password": passw
     }
 
-    return jsrpc.ava_call(avaconfig.kurl, "keystore.exportUser", data)
+    return caller("keystore.exportUser", data)
 
 
 def importUser(usern, passw, user):
@@ -50,6 +52,6 @@ def importUser(usern, passw, user):
         "user": user
     }
 
-    return jsrpc.ava_call(avaconfig.kurl, "keystore.importUser", data)
+    return caller("keystore.importUser", data)
 
 

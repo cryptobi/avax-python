@@ -2,10 +2,11 @@
 # Author: https://github.com/zefonseca/
 # License MIT
 
-import avaconfig
+import avapython
 import jsrpc
 import warnings
 
+caller = avapython.get_caller()
 
 def getNodeID():
 
@@ -13,7 +14,7 @@ def getNodeID():
 
     data = {}
 
-    ret = jsrpc.ava_call(avaconfig.aurl, "admin.getNodeID", data)
+    ret = caller("admin.getNodeID", data)
     return ret["nodeID"]
 
 
@@ -23,7 +24,7 @@ def peers():
 
     data = {}
 
-    ret = jsrpc.ava_call(avaconfig.aurl, "admin.peers", data)
+    ret = caller("admin.peers", data)
     return ret["peers"]
 
 
@@ -33,7 +34,7 @@ def getNetworkID():
 
     data = {}
 
-    ret = jsrpc.ava_call(avaconfig.aurl, "admin.getNetworkID", data)
+    ret = caller("admin.getNetworkID", data)
     return ret["networkID"]
 
 
@@ -44,7 +45,7 @@ def alias(endpoint, alias):
         "endpoint": endpoint
     }
 
-    ret = jsrpc.ava_call(avaconfig.aurl, "admin.alias", data)
+    ret = caller("admin.alias", data)
     return ret["success"]
 
 
@@ -55,7 +56,7 @@ def aliasChain(chain, alias):
         "chain": chain
     }
 
-    ret = jsrpc.ava_call(avaconfig.aurl, "admin.aliasChain", data)
+    ret = caller("admin.aliasChain", data)
     return ret["success"]
 
 
@@ -67,7 +68,7 @@ def getBlockchainID(alias):
         "alias": alias
     }
 
-    ret = jsrpc.ava_call(avaconfig.aurl, "admin.getBlockchainID", data)
+    ret = caller("admin.getBlockchainID", data)
     return ret["blockchainID"]
 
 
@@ -77,7 +78,7 @@ def startCPUProfiler(fileName):
         "fileName": fileName
     }
 
-    ret = jsrpc.ava_call(avaconfig.aurl, "admin.startCPUProfiler", data)
+    ret = caller("admin.startCPUProfiler", data)
     return ret["success"]
 
 
@@ -85,7 +86,7 @@ def stopCPUProfiler():
 
     data = {}
 
-    ret = jsrpc.ava_call(avaconfig.aurl, "admin.stopCPUProfiler", data)
+    ret = caller("admin.stopCPUProfiler", data)
     return ret["success"]
 
 
@@ -95,7 +96,7 @@ def memoryProfile(fileName):
         "fileName": fileName
     }
 
-    ret = jsrpc.ava_call(avaconfig.aurl, "admin.memoryProfile", data)
+    ret = caller("admin.memoryProfile", data)
     return ret["success"]
 
 
@@ -105,5 +106,5 @@ def lockProfile(fileName):
         "fileName": fileName
     }
 
-    ret = jsrpc.ava_call(avaconfig.aurl, "admin.lockProfile", data)
+    ret = caller("admin.lockProfile", data)
     return ret["success"]

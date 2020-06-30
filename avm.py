@@ -2,9 +2,10 @@
 # Author: https://github.com/zefonseca/
 # License MIT
 
-import avaconfig
+import avapython
 import jsrpc
 
+caller = avapython.get_caller()
 
 def buildGenesis(genesisData):
 
@@ -12,7 +13,7 @@ def buildGenesis(genesisData):
         "genesisData": genesisData
     }
 
-    return jsrpc.ava_call(avaconfig.xurl, "avm.buildGenesis", data)
+    return caller("avm.buildGenesis", data)
 
 
 def importKey(privateKey, username, password):
@@ -23,7 +24,7 @@ def importKey(privateKey, username, password):
         "password": password
     }
 
-    return jsrpc.ava_call(avaconfig.xurl, "avm.importKey", data)
+    return caller("avm.importKey", data)
 
 
 def exportKey(address, username, password):
@@ -34,7 +35,7 @@ def exportKey(address, username, password):
         "password": password
     }
 
-    return jsrpc.ava_call(avaconfig.xurl, "avm.exportKey", data)
+    return caller("avm.exportKey", data)
 
 
 def exportAVA(to_addr, amt, username, password):
@@ -46,7 +47,7 @@ def exportAVA(to_addr, amt, username, password):
         "password": password
     }
 
-    return jsrpc.ava_call(avaconfig.xurl, "avm.exportAVA", data)
+    return caller("avm.exportAVA", data)
 
 
 def importAVA(to, username, password):
@@ -57,7 +58,7 @@ def importAVA(to, username, password):
         "password": password
     }
 
-    return jsrpc.ava_call(avaconfig.xurl, "avm.importAVA", data)
+    return caller("avm.importAVA", data)
 
 
 def getAllBalances(address):
@@ -66,7 +67,7 @@ def getAllBalances(address):
         "address": address
     }
 
-    return jsrpc.ava_call(avaconfig.xurl, "avm.getAllBalances", data)
+    return caller("avm.getAllBalances", data)
 
 
 def getBalance(address, assetID):
@@ -76,7 +77,7 @@ def getBalance(address, assetID):
         "assetID": assetID
     }
 
-    return jsrpc.ava_call(avaconfig.xurl, "avm.getBalance", data)
+    return caller("avm.getBalance", data)
 
 
 def getUTXOs(addresses):
@@ -85,7 +86,7 @@ def getUTXOs(addresses):
         "addresses": addresses
     }
 
-    return jsrpc.ava_call(avaconfig.xurl, "avm.getUTXOs", data)
+    return caller("avm.getUTXOs", data)
 
 
 def getTxStatus(txID):
@@ -94,7 +95,7 @@ def getTxStatus(txID):
         "txID": txID
     }
 
-    return jsrpc.ava_call(avaconfig.xurl, "avm.getTxStatus", data)
+    return caller("avm.getTxStatus", data)
 
 
 def createAddress(username, password):
@@ -104,7 +105,7 @@ def createAddress(username, password):
         "password": password
     }
 
-    return jsrpc.ava_call(avaconfig.xurl, "avm.createAddress", data)
+    return caller("avm.createAddress", data)
 
 
 def listAddresses(username, password):
@@ -114,7 +115,7 @@ def listAddresses(username, password):
         "password": password
     }
 
-    return jsrpc.ava_call(avaconfig.xurl, "avm.listAddresses", data)
+    return caller("avm.listAddresses", data)
 
 
 def issueTx(tx):
@@ -123,7 +124,7 @@ def issueTx(tx):
         "tx": tx
     }
 
-    return jsrpc.ava_call(avaconfig.xurl, "avm.issueTx", data)
+    return caller("avm.issueTx", data)
 
 
 def signMintTx(tx, minter, username, password):
@@ -135,7 +136,7 @@ def signMintTx(tx, minter, username, password):
         "password": password
     }
 
-    return jsrpc.ava_call(avaconfig.xurl, "avm.signMintTx", data)
+    return caller("avm.signMintTx", data)
 
 
 def createMintTx(amount, assetID, to, minters):
@@ -147,7 +148,7 @@ def createMintTx(amount, assetID, to, minters):
         "minters": minters
     }
 
-    return jsrpc.ava_call(avaconfig.xurl, "avm.createMintTx", data)
+    return caller("avm.createMintTx", data)
 
 
 
@@ -161,7 +162,7 @@ def send(amount, assetID, to, username, password):
         "password": password
     }
 
-    return jsrpc.ava_call(avaconfig.xurl, "avm.send", data)
+    return caller("avm.send", data)
 
 
 def createFixedCapAsset(name, symbol, denomination, initialHolders, username, password):
@@ -182,7 +183,7 @@ def createFixedCapAsset(name, symbol, denomination, initialHolders, username, pa
         "password": password
     }
 
-    return jsrpc.ava_call(avaconfig.xurl, "avm.createFixedCapAsset", data)
+    return caller("avm.createFixedCapAsset", data)
 
 
 
@@ -204,7 +205,7 @@ def createVariableCapAsset(name, symbol, denomination, minterSets, username, pas
         "password": password
     }
 
-    return jsrpc.ava_call(avaconfig.xurl, "avm.createVariableCapAsset", data)
+    return caller("avm.createVariableCapAsset", data)
 
 
 def getAssetDescription(assetID):
@@ -213,6 +214,6 @@ def getAssetDescription(assetID):
         "assetID": assetID
     }
 
-    return jsrpc.ava_call(avaconfig.xurl, "avm.getAssetDescription", data)
+    return caller("avm.getAssetDescription", data)
 
 

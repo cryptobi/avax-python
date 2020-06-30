@@ -2,9 +2,10 @@
 # Author: https://github.com/zefonseca/
 # License MIT
 
-import avaconfig
+import avapython
 import jsrpc
 
+caller = avapython.get_caller()
 
 def publishBlockchain(blockchainID):
 
@@ -12,7 +13,7 @@ def publishBlockchain(blockchainID):
         "blockchainID": blockchainID
     }
 
-    return jsrpc.ava_call(avaconfig.iurl, "ipcs.publishBlockchain", data)
+    return caller("ipcs.publishBlockchain", data)
 
 
 def unpublishBlockchain(blockchainID):
@@ -21,4 +22,4 @@ def unpublishBlockchain(blockchainID):
         "blockchainID": blockchainID
     }
 
-    return jsrpc.ava_call(avaconfig.iurl, "ipcs.unpublishBlockchain", data)
+    return caller("ipcs.unpublishBlockchain", data)

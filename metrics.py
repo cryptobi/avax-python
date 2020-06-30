@@ -2,12 +2,13 @@
 # Author: https://github.com/zefonseca/
 # License MIT
 
-import avaconfig
+import avapython
 import jsrpc
 
+caller = avapython.get_poster()
 
 def metrics():
-    mts = jsrpc.ava_post(avaconfig.murl, None).text
+    mts = caller(None).text
     print(mts)
     ret = {}
     for it in mts.split('\n'):

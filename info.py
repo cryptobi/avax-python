@@ -2,9 +2,10 @@
 # Author: https://github.com/zefonseca/
 # License MIT
 
-import avaconfig
+import avapython
 import jsrpc
 
+caller = avapython.get_caller()
 
 def getBlockchainID(alias):
     
@@ -12,7 +13,7 @@ def getBlockchainID(alias):
         "alias": alias
     }
 
-    ret = jsrpc.ava_call(avaconfig.iurl, "info.getBlockchainID", data)
+    ret = caller("info.getBlockchainID", data)
     return ret["blockchainID"]
 
 
@@ -20,7 +21,7 @@ def getNetworkID():
     
     data = {}
 
-    ret = jsrpc.ava_call(avaconfig.iurl, "info.getNetworkID", data)
+    ret = caller("info.getNetworkID", data)
     return ret["networkID"]
 
 
@@ -28,7 +29,7 @@ def getNetworkName():
     
     data = {}
 
-    ret = jsrpc.ava_call(avaconfig.iurl, "info.getNetworkName", data)
+    ret = caller("info.getNetworkName", data)
     return ret["networkName"]    
 
 
@@ -36,7 +37,7 @@ def getNodeID():
     
     data = {}
 
-    ret = jsrpc.ava_call(avaconfig.iurl, "info.getNodeID", data)
+    ret = caller("info.getNodeID", data)
     return ret["nodeID"]      
 
 
@@ -44,7 +45,7 @@ def getNodeVersion():
     
     data = {}
 
-    ret = jsrpc.ava_call(avaconfig.iurl, "info.getNodeVersion", data)
+    ret = caller("info.getNodeVersion", data)
     return ret["version"]        
 
 
@@ -52,5 +53,5 @@ def peers():
     
     data = {}
 
-    ret = jsrpc.ava_call(avaconfig.iurl, "info.peers", data)
+    ret = caller("info.peers", data)
     return ret["peers"]    

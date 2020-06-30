@@ -2,22 +2,23 @@
 # Author: https://github.com/zefonseca/
 # License MIT
 
-import avaconfig
+import avapython
 import jsrpc
 
+caller = avapython.get_caller()
 
 def getAccount(address):
     data = {
         "address": address
     }
 
-    return jsrpc.ava_call(avaconfig.purl, "platform.getAccount", data)
+    return caller("platform.getAccount", data)
 
 
 def getSubnets():
     data = {}
 
-    return jsrpc.ava_call(avaconfig.purl, "platform.getSubnets", data)
+    return caller("platform.getSubnets", data)
 
 
 def createBlockchain(subnetID, vmID, name, payerNonce, genesisData):
@@ -30,7 +31,7 @@ def createBlockchain(subnetID, vmID, name, payerNonce, genesisData):
         "genesisData": genesisData
     }
 
-    return jsrpc.ava_call(avaconfig.purl, "platform.createBlockchain", data)
+    return caller("platform.createBlockchain", data)
 
 
 def getBlockchainStatus(blockchainID):
@@ -39,7 +40,7 @@ def getBlockchainStatus(blockchainID):
         "blockchainID": blockchainID
     }
 
-    return jsrpc.ava_call(avaconfig.purl, "platform.getBlockchainStatus", data)
+    return caller("platform.getBlockchainStatus", data)
 
 
 
@@ -52,7 +53,7 @@ def importAVA(to_addr, nonce, usern, passw):
         "payerNonce": nonce
     }
 
-    return jsrpc.ava_call(avaconfig.purl, "platform.importAVA", data)
+    return caller("platform.importAVA", data)
 
 
 def exportAVA(amount, to, payerNonce):
@@ -63,7 +64,7 @@ def exportAVA(amount, to, payerNonce):
         "payerNonce": payerNonce
     }
 
-    return jsrpc.ava_call(avaconfig.purl, "platform.importAVA", data)
+    return caller("platform.importAVA", data)
 
 
 def issueTx(tx):
@@ -72,7 +73,7 @@ def issueTx(tx):
         "tx": tx
     }
 
-    return jsrpc.ava_call(avaconfig.purl, "platform.issueTx", data)
+    return caller("platform.issueTx", data)
 
 
 def listAccounts(usern, passw):
@@ -82,7 +83,7 @@ def listAccounts(usern, passw):
         "password": passw
     }
 
-    ret = jsrpc.ava_call(avaconfig.purl, "platform.listAccounts", data)
+    ret = caller("platform.listAccounts", data)
     return ret["accounts"]
 
 
@@ -97,7 +98,7 @@ def addDefaultSubnetValidator(host_id, nonce, dest_addr, start_time, end_time, a
         "stakeAmount": int(amount)
     }
 
-    return jsrpc.ava_call(avaconfig.purl, "platform.addDefaultSubnetValidator", data)
+    return caller("platform.addDefaultSubnetValidator", data)
 
 
 def addNonDefaultSubnetValidator(host_id, subnetID, startTime, endTime, weight, payerNonce):
@@ -111,7 +112,7 @@ def addNonDefaultSubnetValidator(host_id, subnetID, startTime, endTime, weight, 
         "payerNonce": payerNonce
     }
 
-    return jsrpc.ava_call(avaconfig.purl, "platform.addDefaultSubnetValidator", data)
+    return caller("platform.addDefaultSubnetValidator", data)
 
 
 def sign(tx, signer_addr, usern, passw):
@@ -123,7 +124,7 @@ def sign(tx, signer_addr, usern, passw):
         "password": passw
     }
 
-    return jsrpc.ava_call(avaconfig.purl, "platform.sign", data)
+    return caller("platform.sign", data)
 
 
 def getPendingValidators(subnetID=None):
@@ -133,7 +134,7 @@ def getPendingValidators(subnetID=None):
     if subnetID:
         data["subnetID"] = subnetID
 
-    return jsrpc.ava_call(avaconfig.purl, "platform.getPendingValidators", data)
+    return caller("platform.getPendingValidators", data)
 
 
 def getCurrentValidators(subnetID=None):
@@ -143,7 +144,7 @@ def getCurrentValidators(subnetID=None):
     if subnetID:
         data["subnetID"] = subnetID
 
-    return jsrpc.ava_call(avaconfig.purl, "platform.getCurrentValidators", data)
+    return caller("platform.getCurrentValidators", data)
 
 
 def sampleValidators(subnetID=None, size=50):
@@ -156,14 +157,14 @@ def sampleValidators(subnetID=None, size=50):
     if subnetID:
         data["subnetID"] = subnetID
 
-    return jsrpc.ava_call(avaconfig.purl, "platform.sampleValidators", data)
+    return caller("platform.sampleValidators", data)
 
 
 def validates(subnetID):
 
     data = {"subnetID": subnetID}
 
-    return jsrpc.ava_call(avaconfig.purl, "platform.validates", data)
+    return caller("platform.validates", data)
 
 
 def getBlockchains():
@@ -171,7 +172,7 @@ def getBlockchains():
     data = {}
 
 
-    return jsrpc.ava_call(avaconfig.purl, "platform.getBlockchains", data)
+    return caller("platform.getBlockchains", data)
 
 
 def createAccount(usern, passw):
@@ -181,7 +182,7 @@ def createAccount(usern, passw):
         "password": passw
     }
 
-    return jsrpc.ava_call(avaconfig.purl, "platform.createAccount", data)
+    return caller("platform.createAccount", data)
 
 
 def createSubnet(controlKeys, threshold, payerNonce):
@@ -192,6 +193,6 @@ def createSubnet(controlKeys, threshold, payerNonce):
         "threshold": threshold
     }
 
-    return jsrpc.ava_call(avaconfig.purl, "platform.createSubnet", data)
+    return caller("platform.createSubnet", data)
 
 

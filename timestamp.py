@@ -2,9 +2,10 @@
 # Author: https://github.com/zefonseca/
 # License MIT
 
-import avaconfig
+import avapython
 import jsrpc
 
+caller = avapython.get_caller()
 
 def getBlock(block_id):
 
@@ -12,7 +13,7 @@ def getBlock(block_id):
         "id": block_id
     }
 
-    return jsrpc.ava_call(avaconfig.turl, "timestamp.getBlock", params)
+    return caller("timestamp.getBlock", params)
 
 
 def proposeBlock(data):
@@ -21,4 +22,4 @@ def proposeBlock(data):
         "data": data
     }
 
-    return jsrpc.ava_call(avaconfig.turl, "timestamp.proposeBlock", params)
+    return caller("timestamp.proposeBlock", params)
