@@ -31,13 +31,13 @@ Done!
 
 ## Implement the AVA API in Any Language
 
-The `spec2py.py` script reads the API specification in `api.spec`, the grammar in `api.tatsu` and generates an AST which can be
+The `spec2py.py` script reads the API specification in `api.specification`, the grammar in `api.tatsu` and generates an AST which can be
 used to implement the API in any language.
 
-If you need to customize the API, the `api.spec` file format is very simple. 
+If you need to customize the API, the `api.specification` file format is very simple. 
 
 * An API endpoint begins a new section. Leave a blank line after the endpoint:/url/here line.
-* See the provided `api.spec` file and follow the same syntax for function definitions.
+* See the provided `api.specification` file and follow the same syntax for function definitions.
 * Functions can be defined over several lines. Don't leave blank lines within a function definition.
 * Leave one blank line after each function definition.
 
@@ -47,7 +47,7 @@ Note that changing the grammar will require changes to `spec2py.py`. The generat
 
 ## Requirements
 
-If you plan on generating the python files from `api.spec`, then `spec2py.py` requires `TatSu`
+If you plan on generating the python files from `api.specification`, then `spec2py.py` requires `TatSu`
 
     sudo pip install TatSu    
 
