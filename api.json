@@ -1,0 +1,1305 @@
+{
+    "/ext/P": {
+        "platform": {
+            "addDefaultSubnetDelegator": {
+                "parameters": {
+                    "destination": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "endTime": {
+                        "optional": false,
+                        "type": "int"
+                    },
+                    "id": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "payerNonce": {
+                        "optional": false,
+                        "type": "int"
+                    },
+                    "stakeAmount": {
+                        "optional": false,
+                        "type": "int"
+                    },
+                    "startTime": {
+                        "optional": false,
+                        "type": "int"
+                    }
+                },
+                "returns": {
+                    "unsignedTx": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "addDefaultSubnetValidator": {
+                "parameters": {
+                    "delegationFeeRate": {
+                        "optional": false,
+                        "type": "int"
+                    },
+                    "destination": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "endTime": {
+                        "optional": false,
+                        "type": "int"
+                    },
+                    "id": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "payerNonce": {
+                        "optional": false,
+                        "type": "int"
+                    },
+                    "stakeAmount": {
+                        "optional": false,
+                        "type": "int"
+                    },
+                    "startTime": {
+                        "optional": false,
+                        "type": "int"
+                    }
+                },
+                "returns": {
+                    "unsignedTx": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "addNonDefaultSubnetValidator": {
+                "parameters": {
+                    "endTime": {
+                        "optional": false,
+                        "type": "int"
+                    },
+                    "id": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "payerNonce": {
+                        "optional": false,
+                        "type": "int"
+                    },
+                    "startTime": {
+                        "optional": false,
+                        "type": "int"
+                    },
+                    "subnetID": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "weight": {
+                        "optional": false,
+                        "type": "int"
+                    }
+                },
+                "returns": {
+                    "unsignedTx": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "createAccount": {
+                "parameters": {
+                    "password": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "username": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "address": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "createBlockchain": {
+                "parameters": {
+                    "genesisData": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "name": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "payerNonce": {
+                        "optional": false,
+                        "type": "int"
+                    },
+                    "subnetID": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "vmID": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "unsignedTx": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "createSubnet": {
+                "parameters": {
+                    "controlKeys": {
+                        "optional": false,
+                        "type": {
+                            "[]": {}
+                        }
+                    },
+                    "payerNonce": {
+                        "optional": false,
+                        "type": "int"
+                    },
+                    "threshold": {
+                        "optional": false,
+                        "type": "int"
+                    }
+                },
+                "returns": {
+                    "unsignedTx": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "exportAVA": {
+                "parameters": {
+                    "amount": {
+                        "optional": false,
+                        "type": "int"
+                    },
+                    "payerNonce": {
+                        "optional": false,
+                        "type": "int"
+                    },
+                    "to": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "unsigndTx": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "exportKey": {
+                "parameters": {
+                    "address": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "password": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "username": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "privateKey": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "getAccount": {
+                "parameters": {
+                    "address": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "address": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "balance": {
+                        "optional": false,
+                        "type": "int"
+                    },
+                    "nonce": {
+                        "optional": false,
+                        "type": "int"
+                    }
+                }
+            },
+            "getBlockchainStatus": {
+                "parameters": {
+                    "blockchainID": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "status": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "getBlockchains": {
+                "parameters": {},
+                "returns": {
+                    "blockchains": {
+                        "optional": false,
+                        "type": {
+                            "[]": {}
+                        }
+                    }
+                }
+            },
+            "getCurrentValidators": {
+                "parameters": {
+                    "subnetID": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "validators": {
+                        "optional": false,
+                        "type": {
+                            "[]": {}
+                        }
+                    }
+                }
+            },
+            "getPendingValidators": {
+                "parameters": {
+                    "subnetID": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "validators": {
+                        "optional": false,
+                        "type": {
+                            "[]": {}
+                        }
+                    }
+                }
+            },
+            "getSubnets": {
+                "parameters": {},
+                "returns": {
+                    "subnets": {
+                        "optional": false,
+                        "type": {
+                            "[]": {}
+                        }
+                    }
+                }
+            },
+            "importAVA": {
+                "parameters": {
+                    "password": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "payerNonce": {
+                        "optional": false,
+                        "type": "int"
+                    },
+                    "to": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "username": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "tx": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "importKey": {
+                "parameters": {
+                    "password": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "privateKey": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "username": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "address": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "issueTx": {
+                "parameters": {
+                    "tx": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "txID": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "listAccounts": {
+                "parameters": {
+                    "password": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "username": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "accounts": {
+                        "optional": false,
+                        "type": {
+                            "[]": {}
+                        }
+                    }
+                }
+            },
+            "sampleValidators": {
+                "parameters": {
+                    "size": {
+                        "optional": false,
+                        "type": "int"
+                    },
+                    "subnetID": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "validators": {
+                        "optional": false,
+                        "type": "[size]string"
+                    }
+                }
+            },
+            "sign": {
+                "parameters": {
+                    "password": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "signer": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "tx": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "username": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "tx": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "validatedBy": {
+                "parameters": {
+                    "blockchainID": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "subnetID": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "validates": {
+                "parameters": {
+                    "subnetID": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "blockchainIDs": {
+                        "optional": false,
+                        "type": {
+                            "[]": {
+                                "optional": false,
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/ext/admin": {
+        "admin": {
+            "alias": {
+                "parameters": {
+                    "alias": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "endpoint": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "success": {
+                        "optional": false,
+                        "type": "bool"
+                    }
+                }
+            },
+            "aliasChain": {
+                "parameters": {
+                    "alias": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "chain": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "success": {
+                        "optional": false,
+                        "type": "bool"
+                    }
+                }
+            },
+            "getBlockchainID": {
+                "parameters": {
+                    "alias": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "blockchainID": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "getNetworkID": {
+                "parameters": {},
+                "returns": {
+                    "networkID": {
+                        "optional": false,
+                        "type": "int"
+                    }
+                }
+            },
+            "getNetworkName": {
+                "parameters": {},
+                "returns": {
+                    "networkName": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "getNodeID": {
+                "parameters": {},
+                "returns": {
+                    "nodeID": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "getNodeVersion": {
+                "parameters": {},
+                "returns": {
+                    "version": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "lockProfile": {
+                "parameters": {
+                    "fileName": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "success": {
+                        "optional": false,
+                        "type": "bool"
+                    }
+                }
+            },
+            "memoryProfile": {
+                "parameters": {
+                    "fileName": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "success": {
+                        "optional": false,
+                        "type": "bool"
+                    }
+                }
+            },
+            "peers": {
+                "parameters": {},
+                "returns": {
+                    "peers": {
+                        "optional": false,
+                        "type": {
+                            "[]": {}
+                        }
+                    }
+                }
+            },
+            "startCPUProfiler": {
+                "parameters": {
+                    "fileName": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "success": {
+                        "optional": false,
+                        "type": "bool"
+                    }
+                }
+            },
+            "stopCPUProfiler": {
+                "parameters": {},
+                "returns": {
+                    "success": {
+                        "optional": false,
+                        "type": "bool"
+                    }
+                }
+            }
+        }
+    },
+    "/ext/bc/X": {
+        "avm": {
+            "Send": {
+                "parameters": {
+                    "amount": {
+                        "optional": false,
+                        "type": "int"
+                    },
+                    "assetID": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "password": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "to": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "username": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "txID": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "buildGenesis": {
+                "parameters": {},
+                "returns": {
+                    "bytes": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "createAddress": {
+                "parameters": {
+                    "password": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "username": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "address": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "createFixedCapAsset": {
+                "parameters": {
+                    "denomination": {
+                        "optional": false,
+                        "type": "int"
+                    },
+                    "initialHolders": {
+                        "optional": false,
+                        "type": {
+                            "[]": {}
+                        }
+                    },
+                    "name": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "password": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "symbol": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "username": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "assetID": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "createMintTx": {
+                "parameters": {
+                    "amount": {
+                        "optional": false,
+                        "type": "int"
+                    },
+                    "assetID": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "minters": {
+                        "optional": false,
+                        "type": {
+                            "[]": {
+                                "optional": false,
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "to": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "tx": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "createVariableCapAsset": {
+                "parameters": {
+                    "denomination": {
+                        "optional": false,
+                        "type": "int"
+                    },
+                    "minterSets": {
+                        "optional": false,
+                        "type": {
+                            "[]": {}
+                        }
+                    },
+                    "name": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "password": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "symbol": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "username": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "assetID": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "exportAVA": {
+                "parameters": {
+                    "amount": {
+                        "optional": false,
+                        "type": "int"
+                    },
+                    "password": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "to": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "username": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "txID": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "exportKey": {
+                "parameters": {
+                    "address": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "password": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "username": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "privateKey": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "getAllBalances": {
+                "parameters": {
+                    "address": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "balances": {
+                        "optional": false,
+                        "type": {
+                            "[]": {}
+                        }
+                    }
+                }
+            },
+            "getAssetDescription": {
+                "parameters": {
+                    "assetID": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "denomination": {
+                        "optional": false,
+                        "type": "int"
+                    },
+                    "name": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "symbol": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "getBalance": {
+                "parameters": {
+                    "address": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "assetID": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "balance": {
+                        "optional": false,
+                        "type": "int"
+                    }
+                }
+            },
+            "getTx": {
+                "parameters": {
+                    "txID": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "tx": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "getTxStatus": {
+                "parameters": {
+                    "txID": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "status": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "getUTXOs": {
+                "parameters": {
+                    "addresses": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "utxos": {
+                        "optional": false,
+                        "type": {
+                            "[]": {
+                                "optional": false,
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "importAVA": {
+                "parameters": {
+                    "password": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "to": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "username": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "txID": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "importKey": {
+                "parameters": {
+                    "password": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "privateKey": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "username": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "address": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "issueTx": {
+                "parameters": {
+                    "tx": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "txID": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "listAddresses": {
+                "parameters": {
+                    "password": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "username": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "addresses": {
+                        "optional": false,
+                        "type": {
+                            "[]": {
+                                "optional": false,
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "signMintTx": {
+                "parameters": {
+                    "minter": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "password": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "tx": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "username": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "tx": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    },
+    "/ext/health": {
+        "health": {
+            "getLiveness": {
+                "parameters": {},
+                "returns": {
+                    "checks": {
+                        "optional": false,
+                        "type": {
+                            "{}": {}
+                        }
+                    },
+                    "healthy": {
+                        "optional": false,
+                        "type": "bool"
+                    }
+                }
+            }
+        }
+    },
+    "/ext/info": {
+        "info": {
+            "getBlockchainID": {
+                "parameters": {
+                    "alias": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "blockchainID": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "getNetworkID": {
+                "parameters": {},
+                "returns": {
+                    "networkID": {
+                        "optional": false,
+                        "type": "int"
+                    }
+                }
+            },
+            "getNetworkName": {
+                "parameters": {},
+                "returns": {
+                    "networkName": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "getNodeID": {
+                "parameters": {},
+                "returns": {
+                    "nodeID": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "getNodeVersion": {
+                "parameters": {},
+                "returns": {
+                    "version": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "peers": {
+                "parameters": {},
+                "returns": {
+                    "peers": {
+                        "optional": false,
+                        "type": {
+                            "[]": {}
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/ext/ipcs": {
+        "ipcs": {
+            "publishBlockchain": {
+                "parameters": {
+                    "blockchainID": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "url": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "unpublishBlockchain": {
+                "parameters": {
+                    "blockchainID": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "success": {
+                        "optional": false,
+                        "type": "bool"
+                    }
+                }
+            }
+        }
+    },
+    "/ext/keystore": {
+        "keystore": {
+            "ListUsers": {
+                "parameters": {},
+                "returns": {
+                    "users": {
+                        "optional": false,
+                        "type": {
+                            "[]": {
+                                "optional": false,
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "createUser": {
+                "parameters": {
+                    "password": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "username": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "success": {
+                        "optional": false,
+                        "type": "bool"
+                    }
+                }
+            },
+            "deleteUser": {
+                "parameters": {
+                    "password": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "username": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "success": {
+                        "optional": false,
+                        "type": "bool"
+                    }
+                }
+            },
+            "exportUser": {
+                "parameters": {
+                    "password": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "username": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "user": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "importUser": {
+                "parameters": {
+                    "password": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "user": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "username": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "success": {
+                        "optional": false,
+                        "type": "bool"
+                    }
+                }
+            }
+        }
+    },
+    "/ext/timestamp": {
+        "timestamp": {
+            "getBlock": {
+                "parameters": {
+                    "id": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "data": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "id": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "parentID": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "timestamp": {
+                        "optional": false,
+                        "type": "int"
+                    }
+                }
+            },
+            "proposeBlock": {
+                "parameters": {
+                    "data": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "success": {
+                        "optional": false,
+                        "type": "bool"
+                    }
+                }
+            }
+        }
+    }
+}
