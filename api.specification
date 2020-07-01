@@ -142,7 +142,7 @@ avm.importKey({
     privateKey:string
 }) -> {address: string}
 
-avm.buildGenesis(genesisData:JSON) -> {bytes:string}
+avm.buildGenesis({genesisData: JSON}) -> {bytes:string}
 
 endpoint: /ext/health
 
@@ -216,7 +216,7 @@ keystore.importUser(
     }
 ) -> {success:bool}
 
-endpoint: /ext/P
+endpoint: /ext/bc/P
 
 platform.createBlockchain(
     {

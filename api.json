@@ -1,5 +1,158 @@
+['avm.buildGenesis', '(', '{', [['genesisData', ':', 'JSON']], '}', ')', '->', ['{', [['bytes', ':', 'string']], '}']]
 {
-    "/ext/P": {
+    "/ext/admin": {
+        "admin": {
+            "alias": {
+                "parameters": {
+                    "alias": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "endpoint": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "success": {
+                        "optional": false,
+                        "type": "bool"
+                    }
+                }
+            },
+            "aliasChain": {
+                "parameters": {
+                    "alias": {
+                        "optional": false,
+                        "type": "string"
+                    },
+                    "chain": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "success": {
+                        "optional": false,
+                        "type": "bool"
+                    }
+                }
+            },
+            "getBlockchainID": {
+                "parameters": {
+                    "alias": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "blockchainID": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "getNetworkID": {
+                "parameters": {},
+                "returns": {
+                    "networkID": {
+                        "optional": false,
+                        "type": "int"
+                    }
+                }
+            },
+            "getNetworkName": {
+                "parameters": {},
+                "returns": {
+                    "networkName": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "getNodeID": {
+                "parameters": {},
+                "returns": {
+                    "nodeID": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "getNodeVersion": {
+                "parameters": {},
+                "returns": {
+                    "version": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "lockProfile": {
+                "parameters": {
+                    "fileName": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "success": {
+                        "optional": false,
+                        "type": "bool"
+                    }
+                }
+            },
+            "memoryProfile": {
+                "parameters": {
+                    "fileName": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "success": {
+                        "optional": false,
+                        "type": "bool"
+                    }
+                }
+            },
+            "peers": {
+                "parameters": {},
+                "returns": {
+                    "peers": {
+                        "optional": false,
+                        "type": {
+                            "[]": {}
+                        }
+                    }
+                }
+            },
+            "startCPUProfiler": {
+                "parameters": {
+                    "fileName": {
+                        "optional": false,
+                        "type": "string"
+                    }
+                },
+                "returns": {
+                    "success": {
+                        "optional": false,
+                        "type": "bool"
+                    }
+                }
+            },
+            "stopCPUProfiler": {
+                "parameters": {},
+                "returns": {
+                    "success": {
+                        "optional": false,
+                        "type": "bool"
+                    }
+                }
+            }
+        }
+    },
+    "/ext/bc/P": {
         "platform": {
             "addDefaultSubnetDelegator": {
                 "parameters": {
@@ -474,158 +627,6 @@
             }
         }
     },
-    "/ext/admin": {
-        "admin": {
-            "alias": {
-                "parameters": {
-                    "alias": {
-                        "optional": false,
-                        "type": "string"
-                    },
-                    "endpoint": {
-                        "optional": false,
-                        "type": "string"
-                    }
-                },
-                "returns": {
-                    "success": {
-                        "optional": false,
-                        "type": "bool"
-                    }
-                }
-            },
-            "aliasChain": {
-                "parameters": {
-                    "alias": {
-                        "optional": false,
-                        "type": "string"
-                    },
-                    "chain": {
-                        "optional": false,
-                        "type": "string"
-                    }
-                },
-                "returns": {
-                    "success": {
-                        "optional": false,
-                        "type": "bool"
-                    }
-                }
-            },
-            "getBlockchainID": {
-                "parameters": {
-                    "alias": {
-                        "optional": false,
-                        "type": "string"
-                    }
-                },
-                "returns": {
-                    "blockchainID": {
-                        "optional": false,
-                        "type": "string"
-                    }
-                }
-            },
-            "getNetworkID": {
-                "parameters": {},
-                "returns": {
-                    "networkID": {
-                        "optional": false,
-                        "type": "int"
-                    }
-                }
-            },
-            "getNetworkName": {
-                "parameters": {},
-                "returns": {
-                    "networkName": {
-                        "optional": false,
-                        "type": "string"
-                    }
-                }
-            },
-            "getNodeID": {
-                "parameters": {},
-                "returns": {
-                    "nodeID": {
-                        "optional": false,
-                        "type": "string"
-                    }
-                }
-            },
-            "getNodeVersion": {
-                "parameters": {},
-                "returns": {
-                    "version": {
-                        "optional": false,
-                        "type": "string"
-                    }
-                }
-            },
-            "lockProfile": {
-                "parameters": {
-                    "fileName": {
-                        "optional": false,
-                        "type": "string"
-                    }
-                },
-                "returns": {
-                    "success": {
-                        "optional": false,
-                        "type": "bool"
-                    }
-                }
-            },
-            "memoryProfile": {
-                "parameters": {
-                    "fileName": {
-                        "optional": false,
-                        "type": "string"
-                    }
-                },
-                "returns": {
-                    "success": {
-                        "optional": false,
-                        "type": "bool"
-                    }
-                }
-            },
-            "peers": {
-                "parameters": {},
-                "returns": {
-                    "peers": {
-                        "optional": false,
-                        "type": {
-                            "[]": {}
-                        }
-                    }
-                }
-            },
-            "startCPUProfiler": {
-                "parameters": {
-                    "fileName": {
-                        "optional": false,
-                        "type": "string"
-                    }
-                },
-                "returns": {
-                    "success": {
-                        "optional": false,
-                        "type": "bool"
-                    }
-                }
-            },
-            "stopCPUProfiler": {
-                "parameters": {},
-                "returns": {
-                    "success": {
-                        "optional": false,
-                        "type": "bool"
-                    }
-                }
-            }
-        }
-    },
     "/ext/bc/X": {
         "avm": {
             "Send": {
@@ -659,7 +660,12 @@
                 }
             },
             "buildGenesis": {
-                "parameters": {},
+                "parameters": {
+                    "genesisData": {
+                        "optional": false,
+                        "type": "JSON"
+                    }
+                },
                 "returns": {
                     "bytes": {
                         "optional": false,
