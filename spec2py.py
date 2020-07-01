@@ -12,7 +12,7 @@ from tatsu.walkers import NodeWalker
 import json
 
 GRAMMAR_FILE = "api.tatsu"
-SPEC_FILE = "api.spec"
+SPEC_FILE = "api.specification"
 
 
 class AvaField():

@@ -1,0 +1,423 @@
+endpoint: /ext/admin
+
+admin.getNodeID() -> {nodeID: string}
+
+admin.peers() -> {peers:[]{
+    ip: string,
+    publicIP: string,
+    id: string,
+    version: string,
+    lastSent: string,
+    lastReceived: string
+}}
+
+admin.getNetworkID() -> {networkID:int}
+
+admin.alias({endpoint:string, alias:string}) -> {success:bool}
+
+admin.aliasChain(
+    {
+        chain:string,
+        alias:string
+    }
+) -> {success:bool}
+
+admin.getBlockchainID({alias:string}) -> {blockchainID:string}
+
+admin.startCPUProfiler({fileName:string}) -> {success:bool}
+
+admin.stopCPUProfiler() -> {success:bool}
+
+admin.memoryProfile({fileName:string}) -> {success:bool}
+
+admin.lockProfile({fileName:string}) -> {success:bool}
+
+admin.getNodeVersion() -> {version: string}
+
+admin.getNetworkName() -> {networkName: string}
+
+endpoint: /ext/bc/X
+
+avm.createAddress({
+    username: string,
+    password:string
+}) -> {address: string}
+
+avm.listAddresses({
+    username: string,
+    password: string
+}) -> {addresses: []string}
+
+avm.getBalance({
+    address:string,
+    assetID: string
+}) -> {balance: int}
+
+avm.getAllBalances({address:string}) -> {
+    balances: []{
+        asset: string,
+        balance: int
+    }
+}
+
+avm.getUTXOs({addresses: string}) -> {utxos: []string}
+
+avm.issueTx({tx: string}) -> {txID: string}
+
+avm.signMintTx({
+    tx: string,
+    minter: string,
+    username: string,
+    password: string
+}) ->  
+{tx: string}
+
+avm.getTxStatus({txID: string}) -> {status: string}
+
+avm.getTx({txID: string}) -> {tx: string}
+
+avm.Send({
+    amount: int,
+    assetID: string,
+    to: string,
+    username: string,
+    password: string
+}) -> {txID: string}
+
+avm.createFixedCapAsset({
+    name: string,
+    symbol: string,
+    denomination: int,  
+    initialHolders: []{
+        address: string,
+        amount: int
+    },
+    username: string,  
+    password: string
+}) -> {assetID: string}
+
+avm.createVariableCapAsset({
+    name: string,
+    symbol: string,
+    denomination: int,  
+    minterSets: []{
+        minters: []string,
+        threshold: int
+    },
+    username: string,  
+    password: string
+}) -> {assetID: string}
+
+avm.createMintTx({
+    amount: int,
+    assetID: string,
+    to: string,
+    minters: []string
+}) -> {tx: string}
+
+avm.getAssetDescription({assetID: string}) -> {name: string, symbol: string, denomination:int}
+
+avm.exportAVA({
+    to: string,
+    amount: int,
+    username: string,
+    password:string,
+}) -> {txID: string}
+
+avm.importAVA({
+    to: string,
+    username: string,
+    password:string,
+}) -> {txID: string}
+
+avm.exportKey({
+    username: string,
+    password:string,
+    address:string
+}) -> {privateKey: string}
+
+avm.importKey({
+    username: string,
+    password:string,
+    privateKey:string
+}) -> {address: string}
+
+avm.buildGenesis(genesisData:JSON) -> {bytes:string}
+
+endpoint: /ext/health
+
+health.getLiveness() -> {
+    checks: {
+        network.validators.heartbeat: {
+            message: {
+                heartbeat: int
+            },
+            timestamp: string,
+            duration: int,
+            contiguousFailures: int,
+            timeOfFirstFailure: int
+        }
+    },
+    healthy: bool
+}
+
+endpoint: /ext/info
+
+info.getBlockchainID({alias:string}) -> {blockchainID:string}
+
+info.getNetworkID() -> {networkID:int}
+
+info.getNetworkName() -> {networkName:string}
+
+info.getNodeID() -> {nodeID: string}
+
+info.getNodeVersion() -> {version: string}
+
+info.peers() -> {peers:[]{
+    ip: string,
+    publicIP: string,
+    id: string,
+    version: string,
+    lastSent: string,
+    lastRecevied: string
+}}
+
+endpoint: /ext/ipcs
+
+ipcs.publishBlockchain({blockchainID: string}) -> {url: string}
+
+ipcs.unpublishBlockchain({blockchainID: string}) -> {success: bool}
+
+endpoint: /ext/keystore
+
+keystore.createUser(
+    {
+        username:string,
+        password:string
+    }
+) -> {success:bool}
+
+keystore.ListUsers() -> {users:[]string}
+
+keystore.deleteUser({username: string, password:string}) -> {success: bool}
+
+keystore.exportUser(
+    {
+        username:string,
+        password:string
+    }
+) -> {user:string}
+
+keystore.importUser(
+    {
+        username:string,
+        password:string,
+        user:string
+    }
+) -> {success:bool}
+
+endpoint: /ext/P
+
+platform.createBlockchain(
+    {
+        subnetID: string,
+        vmID: string,
+        name: string,
+        payerNonce: int,
+        genesisData: string
+    }
+) -> {unsignedTx: string}
+
+platform.getBlockchainStatus(
+    {
+        blockchainID: string
+    }
+) -> {status: string}
+
+platform.createAccount(
+    {
+        username: string,
+        password: string,
+        privateKey: string (optional)
+    }
+) -> {address: string}
+
+platform.importKey({
+    username: string,
+    password:string,
+    privateKey:string
+}) -> {address: string}
+
+platform.exportKey({
+    username: string,
+    password:string,
+    address:string
+}) -> {privateKey: string}
+
+platform.getAccount({address: string}) -> 
+{
+    address: string,
+    nonce: int,
+    balance: int
+}
+
+platform.listAccounts(
+    {
+        username: string,
+        password: string    
+    }
+) -> 
+{
+    accounts: []{
+        address: string,
+        nonce: int,
+        balance: int
+    }
+}
+
+platform.getCurrentValidators({subnetID: string}) -> 
+{
+    validators: []{
+        startTime: int,
+        endTime: int,
+        weight: int, (optional)
+        stakeAmount: int, (optional)
+        address: string,
+        id: string
+    }
+}
+
+platform.getPendingValidators({subnetID: string}) -> 
+{
+    validators: []{
+        startTime: int,
+        endTime: int,
+        weight: int, (optional)
+        stakeAmount: int, (optional)
+        address: string,
+        id: string
+    }
+}
+
+platform.sampleValidators(
+    {
+        size: int,
+        subnetID: string    
+    }
+) -> 
+{
+    validators:[size]string
+}
+
+platform.addDefaultSubnetValidator(
+    {
+        id: string,
+        startTime: int,
+        endTime: int,
+        stakeAmount: int,
+        payerNonce: int,
+        destination: string,
+        delegationFeeRate: int
+    }
+) -> {unsignedTx: string}
+
+platform.addNonDefaultSubnetValidator(
+    {
+        id: string,
+        subnetID: string,
+        startTime: int,
+        endTime: int,
+        weight: int,
+        payerNonce: int
+    }
+) -> {unsignedTx: string}
+
+platform.addDefaultSubnetDelegator(
+    {
+        id: string,
+        startTime: int,
+        endTime: int,
+        stakeAmount: int,
+        payerNonce: int,
+        destination: string
+    }
+) -> {unsignedTx: string}
+
+platform.createSubnet(
+    {
+        controlKeys: []string,
+        threshold: int,
+        payerNonce: int
+    }
+) -> {unsignedTx: string}
+
+platform.getSubnets({}) ->
+{
+    subnets: []{
+            id: string,
+            controlKeys: []string,
+            threshold: string
+    }
+}
+
+platform.validatedBy(
+    {
+        blockchainID: string
+    }
+) -> {subnetID: string}
+
+platform.validates(
+    {
+        subnetID: string
+    }
+) -> {blockchainIDs: []string}
+
+platform.getBlockchains() -> 
+{
+    blockchains: []{
+        id: string,
+        subnetID: string,
+        vmID: string
+    }
+}
+
+platform.exportAVA(
+    {
+        amount: int,
+        to: string,
+        payerNonce: int,
+    }
+) -> {unsigndTx: string}
+
+platform.importAVA(
+    {
+        to: string,
+        payerNonce: int,
+        username: string,
+        password: string
+    }
+) -> {tx: string}
+
+platform.sign(
+    {
+        tx: string,
+        signer: string,
+        username: string,
+        password: string
+    }
+) -> {tx: string}
+
+platform.issueTx({tx: string}) -> {txID: string}
+
+endpoint: /ext/timestamp
+
+timestamp.getBlock({id: string}) -> 
+    {
+        id: string,
+        data: string,
+        timestamp: int,
+        parentID: string
+    }
+
+timestamp.proposeBlock({data: string}) -> {success: bool}
+
