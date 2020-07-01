@@ -29,6 +29,16 @@ Done!
 
     python3 ipcs.publishBlockchains.py
 
+## Generate `apimeta.py`
+
+If you update the `api.specification` file, then you must regenerate the API metainformation file `apimeta.py`
+
+To recreate it, run generate_api.py:
+
+```
+python3 generate_api.py
+```
+
 ## Implement the AVA API in Any Language
 
 The `spec2py.py` script reads the API specification in `api.specification`, the grammar in `api.tatsu` and generates an AST which can be

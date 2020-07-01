@@ -188,9 +188,6 @@ def parse_api(spec_file, grammar_file):
                 package, methodx = ix[0].split(".")                
                 mth = AvaMethod(package, methodx, [], [])
 
-                if methodx == "buildGenesis":
-                    print(ix)
-
                 for inx in range(2, len(ix)):
                     part = ix[inx]
                      

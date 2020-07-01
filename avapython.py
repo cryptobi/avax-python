@@ -5,6 +5,7 @@
 import avaconfig
 import jsrpc
 import inspect
+from apimeta import api_meta
 
 def make_caller(url):
 
