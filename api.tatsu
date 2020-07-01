@@ -1,0 +1,18 @@
+@@grammar :: AVA
+
+# ava-python : python implementation of the AVA API
+# Author: https://github.com/zefonseca/
+# License MIT
+
+# Grammar for the AVA API spec 
+# See tatsu documentation gor grammar syntax:
+# https://tatsu.readthedocs.io/en/stable/syntax.html
+
+# WARNING: Any changes made here will require the spec2py.py script to be updated as well.
+
+api = func api | func;
+
+identifier = /[A-za-z]+[A-za-z0-9\\.\\_\\$]+/;
+spec = ["[]"] identifier ":" ["[]"] (identifier | objspec) [","] ["(optional)"];
+objspec = "{" {spec} "}";
+func = identifier "(" [(spec | objspec)] ")" "->" objspec;
