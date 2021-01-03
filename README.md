@@ -10,10 +10,11 @@ Clone the git repo and run scripts within the downloaded `avax-python/` subdirec
 
 
     git clone https://github.com/ojrdevcom/avax-python.git
-    cd avax-python
+    cd avax-python/api
 
 If you don't have a `git` client available, you may [download a ZIP archive instead](https://github.com/ojrdevcom/avax-python/archive/master.zip).
 
+[Avalanchego](https://github.com/ava-labs/avalanchego) must be running and listening on `localhost` port `9650`
 
 ## Examples
 

@@ -2,11 +2,10 @@
 # Author: https://github.com/ojrdevcom/
 # License MIT
 
-import avaconfig
-import keystore
+import avm
+import avaxconfig
 
-username, password = avaconfig.upass()
+u, p = avaxconfig.upass()
 
-stt = keystore.createUser(username, password)
+stt = avm.listAddresses(u, p)
 print(stt)
-

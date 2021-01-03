@@ -3,9 +3,9 @@
 # License MIT
 
 import avm
-import avaconfig
+import avaxconfig
 
-u, p = avaconfig.upass()
+u, p = avaxconfig.upass()
 
 stt = avm.createAddress(u, p)
 print(stt)

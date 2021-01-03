@@ -2,7 +2,7 @@
 # Author: https://github.com/ojrdevcom/
 # License MIT
 
-# Translate api.spec to avapython
+# Translate api.spec to avaxpython
 # See tatsu grammar syntax https://tatsu.readthedocs.io/en/stable/syntax.html
 
 import re

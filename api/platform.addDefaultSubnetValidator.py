@@ -4,10 +4,10 @@
 
 import platform
 import admin
-import avaconfig
+import avaxconfig
 import time
 
-username, password = avaconfig.upass()
+username, password = avaxconfig.upass()
 host_id = admin.getNodeID()
 accounts = platform.listAccounts(username, password)
 account = accounts[0]

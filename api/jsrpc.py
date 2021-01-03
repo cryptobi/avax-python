@@ -3,7 +3,7 @@
 # License MIT
 
 
-import avaconfig
+import avaxconfig
 import requests
 import json
 import random

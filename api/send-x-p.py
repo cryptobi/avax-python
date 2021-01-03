@@ -5,16 +5,21 @@
 # send AVA from X to P chain
 # usage <dsst_addr> <amnt>
 
-import avaconfig
+import avaxconfig
 import avm
 import platform
 import sys
 import time
 
+
+if len(sys.argv) != 3:
+    print("Usage: python3 {} <dsst_addr> <amnt>".format(sys.argv[0]))
+    exit(1)
+
 to_addr = sys.argv[1]
 amnt = sys.argv[2]
 
-username, password = avaconfig.upass()
+username, password = avaxconfig.upass()
 
 stt = platform.getAccount(to_addr)
 print(stt)

@@ -2,10 +2,10 @@
 # Author: https://github.com/ojrdevcom/
 # License MIT
 
-import avapython
+import avaxpython
 import jsrpc
 
-caller = avapython.get_poster()
+caller = avaxpython.get_poster()
 
 def metrics():
     mts = caller(None).text

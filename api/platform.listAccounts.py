@@ -2,11 +2,10 @@
 # Author: https://github.com/ojrdevcom/
 # License MIT
 
-import avaconfig
+import avaxconfig
 import platform
 
-username, password = avaconfig.upass()
+username, password = avaxconfig.upass()
 
-stt = platform.createAccount(username, password)
+stt = platform.listAccounts(username, password)
 print(stt)
-

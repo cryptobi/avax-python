@@ -2,11 +2,11 @@
 # Author: https://github.com/ojrdevcom/
 # License MIT
 
-import avapython
+import avaxpython
 import jsrpc
 import warnings
 
-caller = avapython.get_caller()
+caller = avaxpython.get_caller()
 
 def getNodeID():
 

@@ -2,10 +2,10 @@
 # Author: https://github.com/ojrdevcom/
 # License MIT
 
-import avapython
+import avaxpython
 import jsrpc
 
-caller = avapython.get_caller()
+caller = avaxpython.get_caller()
 
 # See Ethereum API for reference
 # example method https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_getbalance

@@ -2,15 +2,11 @@
 # Author: https://github.com/ojrdevcom/
 # License MIT
 
-import avaconfig
+import avaxconfig
 import avm
 import platform
 import sys
 import time
 
-to_addr = sys.argv[1]
-
-stt = platform.getAccount(to_addr)
+stt = platform.getSubnets()
 print(stt)
-init_balance = stt["balance"]
-print("BALANCE {}".format(init_balance))

@@ -2,7 +2,7 @@
 # Author: https://github.com/ojrdevcom/
 # License MIT
 
-import avaconfig
+import avaxconfig
 import jsrpc
 import inspect
 from apimeta import api_meta
@@ -32,10 +32,10 @@ def get_caller():
     """
     src_caller = inspect.stack()[1]
     module_name = inspect.getmodule(src_caller[0]).__name__ 
-    return make_caller(avaconfig.urls[module_name])
+    return make_caller(avaxconfig.urls[module_name])
 
 
 def get_poster():
     src_caller = inspect.stack()[1]
     module_name = inspect.getmodule(src_caller[0])    
-    return make_poster(avaconfig.urls[module_name])    
+    return make_poster(avaxconfig.urls[module_name])    
