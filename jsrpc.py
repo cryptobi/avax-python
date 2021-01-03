@@ -1,5 +1,5 @@
-# ava-python : A Python implementation of the AVA API
-# Author: https://github.com/zefonseca/
+# avax-python : Python tools for the exploration of the Avalanche AVAX network.
+# Author: https://github.com/ojrdevcom/
 # License MIT
 
 

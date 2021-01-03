@@ -1,7 +1,7 @@
 @@grammar :: AVA
 
-# ava-python : python implementation of the AVA API
-# Author: https://github.com/zefonseca/
+# avax-python : python implementation of the AVA API
+# Author: https://github.com/ojrdevcom/
 # License MIT
 
 # Grammar for the AVA API spec 

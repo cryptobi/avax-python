@@ -1,10 +1,19 @@
-# ava-python
+# avax-python
 
-A Python implementation of the [AVA API](https://docs.ava.network/v1.0/en/api/intro-apis/)
+A Python library and utils for the exploration of the [Avalanche AVAX](https://crypto.bi/category/avax/) network.
 
-This lib stemmed from utility scripts I used while developing [AVA.DOG](https://AVA.DOG)
+Includes an implementation of basic AVAX API calls.
 
-License: MIT 
+## Installation
+
+Clone the git repo and run scripts within the downloaded `avax-python/` subdirectory.
+
+
+    git clone https://github.com/ojrdevcom/avax-python.git
+    cd avax-python
+
+If you don't have a `git` client available, you may [download a ZIP archive instead](https://github.com/ojrdevcom/avax-python/archive/master.zip).
+
 
 ## Examples
 
@@ -61,9 +70,16 @@ If you plan on generating the python files from `api.specification`, then `spec2
 
     sudo pip install TatSu    
 
-## Yo
+## License
 
-This is Bacon, the [AVA DOG](https://AVA.DOG):
+This software released under the MIT license.
 
-![Bacon the AVA DOG](https://ava.dog/wp-content/themes/avaexplorer/assets/images/bacon2-cartoon-300px-h.png "Bacon, the AVA DOG")
+See the LICENSE file in this distribution for details.
 
+## Legal Notice
+
+Avalanche and AVAX are registered trademarks of Ava Labs Inc.
+
+*This is not an official Ava Labs project. We are in no way affiliated with Ava Labs.*
+
+This free open source software provided for Avalanche AVAX learning and exploration purposes.
