@@ -4,6 +4,12 @@ A Python library and utils for the exploration of the [Avalanche AVAX](https://c
 
 Includes an implementation of basic AVAX API calls.
 
+## Requirements
+
+    sudo pip3 install numpy
+
+
+
 ## Installation
 
 Clone the git repo and run scripts within the downloaded `avax-python/` subdirectory.
@@ -71,6 +77,16 @@ If you plan on generating the python files from `api.specification`, then `spec2
 
     sudo pip install TatSu    
 
+
+## Notes
+
+Where possible, the python sources have been translated from the [reference Go implementation](https://github.com/ava-labs/avalanchego) following the same directory structure.
+
+Go and Python differ in some concepts, for example names which are defined in one file and are available across a package in Go must be part of some module in Python. 
+
+In these cases a specific Python module is created representing that type. I've tried to make it as intuitive as possible.
+
+
 ## License
 
 This software released under the MIT license.
@@ -84,3 +100,5 @@ Avalanche and AVAX are registered trademarks of Ava Labs Inc.
 *This is not an official Ava Labs project. We are in no way affiliated with Ava Labs.*
 
 This free open source software provided for Avalanche AVAX learning and exploration purposes.
+
+

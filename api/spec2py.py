@@ -1,6 +1,6 @@
 # avax-python : Python tools for the exploration of the Avalanche AVAX network.
-# Author: https://github.com/ojrdevcom/
-# License MIT
+# Author: @ojrdev @ https://crypto.bi
+# --#--#--
 
 # Translate api.spec to avaxpython
 # See tatsu grammar syntax https://tatsu.readthedocs.io/en/stable/syntax.html

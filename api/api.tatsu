@@ -1,8 +1,8 @@
 @@grammar :: AVA
 
 # avax-python : python implementation of the AVA API
-# Author: https://github.com/ojrdevcom/
-# License MIT
+# Author: @ojrdev @ https://crypto.bi
+# --#--#--
 
 # Grammar for the AVA API spec 
 # See tatsu documentation gor grammar syntax:

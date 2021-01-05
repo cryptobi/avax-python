@@ -1,6 +1,6 @@
 # avax-python : Python tools for the exploration of the Avalanche AVAX network.
-# Author: https://github.com/ojrdevcom/
-# License MIT
+# Author: @ojrdev @ https://crypto.bi
+# --#--#--
 
 # send AVA from X to P chain
 # usage <dsst_addr> <amnt>
