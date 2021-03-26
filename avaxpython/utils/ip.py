@@ -67,9 +67,13 @@ class IPDesc:
 
 class IPDesc:
 
-	def __init__(self):
-		self.IP = None
-		self.Port = 0
+	def __init__(self, IP, Port):
+		self.IP = IP
+		self.Port = Port
+
+
+	def __repr__(self):
+		return f"{self.IP}:{self.Port}"
 
 	# Equal ...
 	def Equal(otherIPDesc):
@@ -77,7 +81,7 @@ class IPDesc:
 
 	# PortString ...
 	def PortString():
-		return fmt.Sprintf(":%d", ipDesc.Port)
+		return ":{}".format(self.Port)
 	
 
 	def String():
@@ -98,20 +102,26 @@ class IPDesc:
 		return false
 	
 	# IsZero returns if the IP or port is zeroed out
-	def IsZero():
-		ip = ipDesc.IP
-		return ipDesc.Port == 0 or len(ip) == 0 or ip.Equal(net.IPv4zero) or ip.Equal(net.IPv6zero)
+	def IsZero(self):
+		ip = self.IP
+		return self.Port == 0 or len(ip) == 0 or ip == "0.0.0.0" # or ip.Equal(net.IPv6zero)
 	
 
-class IPDescContainer:
-	def __init__(self):	
-		self.IPDesc = None
-		self.lock = None # TODO
+class IPDescContainer(IPDesc):
 
-class DynamicIPDesc:
+	def __init__(self, ipdesc):	
+		self.IPDesc = ipdesc		
+
+
+class DynamicIPDesc(IPDescContainer):
 	
-	def __init__(self):
-		self.IPDescContainer = IPDescContainer()
+	def __init__(self, ip, port):
+		ipd = IPDesc(ip, port)
+		self.IPDescContainer = IPDescContainer(ipd)
+		self.IPDesc = ipd
+
+	def __repr__(self):
+		return str(self.IPDesc)
 
 	def IP(self):						
 		return self.IPDesc

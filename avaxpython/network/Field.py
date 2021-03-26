@@ -90,7 +90,7 @@ class Field:
     # func(*Packer.Packer, interface{})
     @classmethod
     def Packer(cls, field):
-        if field in cls.__op_packer: 
+        if field in cls.__op_packer:
             return cls.__op_packer.get(field)
     
         raise Exception(f"Field {field} not found")
@@ -100,15 +100,15 @@ class Field:
     # ) func(*Packer.Packer) interface{}
     @classmethod
     def Unpacker(cls, field):
-        if field in cls.__op_unpacker: 
-            return cls.__op_packer.get(field)
+        if field in cls.__op_unpacker:
+            return cls.__op_unpacker.get(field)
     
         raise Exception(f"Field {field} not found")
 
 
     @classmethod
     def String(cls, field):
-        if field in cls.__op_unpacker: 
-            return cls.__op_packer.get(field)
+        if field in cls.__op_string: 
+            return cls.__op_string.get(field)
     
         raise Exception(f"Field {field} not found")

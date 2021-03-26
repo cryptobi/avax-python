@@ -16,21 +16,65 @@ The above copyright notice and this permission notice shall be included in all c
 
 # --#--#--
 
+import threading
+import multiprocessing
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+import inspect
+from avaxpython import Config
 
-from threading import Thread, Lock, Condition
-from . import MP, MT
 
 class Parallel:
 
     _tp_map = {
-        'thread': MT,
-        'process': MP
+        'thread': ThreadPoolExecutor,
+        'process': ProcessPoolExecutor
     }    
 
-    def __init__(self, tp):
+
+    def __init__(self, tp = Config.DEFAULT_WORKER_MODE):
 
         if not tp in Parallel._tp_map:
            raise Exception("Unknown parallelization type.")
 
+        self.mode = tp
+        
         cls = Parallel._tp_map[tp]
-        self.tp = cls()
+        self.cls = cls
+
+        # general worker
+        self.tp = cls(max_workers = Config.MAX_WORKERS)
+
+        # network worker
+        self.netp = cls(max_workers = Config.NETWORK_WORKERS)
+
+
+    def executor(self):
+        """Returns the globally configured Executor class."""
+        return self.cls
+
+
+    def worker(self):
+        """Returns the general worker Executor instance."""
+        return self.tp
+
+
+    def net_worker(self):
+        """Returns the network-specific Executor instance."""
+        return self.netp
+
+
+    def go(self, fn, *args, **kwargs):
+        """Launches a new thread outside of the general and network Executor workers' control."""
+
+        def _f1():
+            fn(*args, **kwargs)
+
+        if self.mode == "thread":
+            t1 = threading.Thread(target = _f1)
+            t1.start()
+        elif self.mode == "process":
+            p1 = multiprocessing.Process(target=_f1)
+            p1.start()
+        else:
+            raise Exception(f"Unknown parallelization mode : {self.mode}")
+

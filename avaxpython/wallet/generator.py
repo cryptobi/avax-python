@@ -24,3 +24,4 @@ def generate(num_wallets = 1, key_strength=256):
     for _ in range(num_wallets):
         words = mnemo.generate(strength=key_strength)
         yield words
+        

@@ -16,16 +16,36 @@ The above copyright notice and this permission notice shall be included in all c
 
 # --#--#--
 
+from avaxpython.utils.ip import IPDesc
+from avaxpython.network import ssl as avaxpython_ssl
+from avaxpython import Config
+import socket
 
-from multiprocessing import Process
-from .ParallelDriver import ParallelDriver
 
-class MP(ParallelDriver):
+class Dialer:
 
-    def __init__(self, tp):
-        
-        if not tp in self._tp_map:
-            raise Exception("Unknown parallelization type.")
+    """Dialer attempts to create a SSL connection with the provided IP/port pair (IPDesc)"""
 
-        cls = self._tp_map[tp]
-        self.tp = cls()
+    def __init__(self, avax_config: Config):
+        self.avax_config = avax_config
+        self.ssl_context = avaxpython_ssl.context_singleton(avax_config)
+
+    def Dial(self, ip: IPDesc):
+        print(f"dialing {ip}")
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)        
+        conn = self.ssl_context.wrap_socket(s)
+
+        try:
+            conn.connect( (ip.IP, ip.Port) )
+        except Exception as e:
+            print(e)
+            return None
+
+        return conn
+
+
+
+def NewDialer(avax_config: Config):
+    return Dialer(avax_config)
+
+

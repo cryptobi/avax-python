@@ -19,18 +19,20 @@ The above copyright notice and this permission notice shall be included in all c
 
 from .Op import Op
 from .Field import Field
+from .codec import Codec
 
 class Builder:
 
-    # GetVersion message
-    @classmethod
-    def GetVersion(cls):
-        return cls.Pack(Op.GetVersion)
+    def __init__(self):
+        pass
 
-    # Version message
-    @classmethod
-    def Version(cls, networkID, nodeID, myTime, ip, myVersion):
-        return cls.Pack(Op.Version, {
+
+    def GetVersion(self):
+        return Codec.Pack(Op.GetVersion)
+
+    
+    def Version(self, networkID, nodeID, myTime, ip, myVersion):
+        return Codec.Pack(Op.Version, {
             Field.NetworkID:  networkID,
             Field.NodeID:     nodeID,
             Field.MyTime:     myTime,
@@ -38,37 +40,31 @@ class Builder:
             Field.VersionStr: myVersion,
         })
 
-    # GetPeerList message
-    @classmethod
+    
     def GetPeerList():
-        return cls.Pack(Op.GetPeerList)
+        return Codec.Pack(Op.GetPeerList)
 
-    # PeerList message
-    @classmethod
+    
     def PeerList(ipDescs):
-        return cls.Pack(Op.PeerList, {Peers: ipDescs})
+        return Codec.Pack(Op.PeerList, {Peers: ipDescs})
 
-    # Ping message
-    @classmethod
+    
     def Ping(): 
-        return cls.Pack(Op.Ping, nil)
+        return Codec.Pack(Op.Ping, nil)
 
-    # Pong message
-    @classmethod
+    
     def Pong(): 
-        return cls.Pack(Op.Pong, nil)
+        return Codec.Pack(Op.Pong, nil)
 
-    # GetAcceptedFrontier message
-    @classmethod
+    # GetAcceptedFrontier message    
     def GetAcceptedFrontier(chainID, requestID, deadline):
-        return cls.Pack(Op.GetAcceptedFrontier, {
+        return Codec.Pack(Op.GetAcceptedFrontier, {
             Field.ChainID:   chainID[:],
             Field.RequestID: requestID,
             Field.Deadline:  deadline,
         })
 
-    # AcceptedFrontier message
-    @classmethod
+    # AcceptedFrontier message    
     def AcceptedFrontier(chainID, requestID, containerIDs):
         containerIDBytes = []
         for containerID in containerIDs:
@@ -76,29 +72,27 @@ class Builder:
             containerIDBytes[i] = copy[:]
         
 
-        return cls.Pack(Op.AcceptedFrontier, {
+        return Codec.Pack(Op.AcceptedFrontier, {
             Field.ChainID:      chainID[:],
             Field.RequestID:    requestID,
             Field.ContainerIDs: containerIDBytes,
         })
 
-    # GetAccepted message
-    @classmethod
+    # GetAccepted message    
     def GetAccepted(chainID, requestID, deadline, containerIDs):
         containerIDBytes = []
         for containerID in containerIDs:
             copy = containerID
             containerIDBytes[i] = copy[:]
         
-        return cls.Pack(Op.GetAccepted, {
+        return Codec.Pack(Op.GetAccepted, {
             Field.ChainID:      chainID[:],
             Field.RequestID:    requestID,
             Field.Deadline:     deadline,
             Field.ContainerIDs: containerIDBytes,
         })
 
-    # Accepted message
-    @classmethod
+    # Accepted message    
     def Accepted(chainID, requestID, containerIDs):
         containerIDBytes = []
 
@@ -106,35 +100,32 @@ class Builder:
             copy = containerID
             containerIDBytes[i] = copy[:]
 
-        return cls.Pack(Op.Accepted, {
+        return Codec.Pack(Op.Accepted, {
             Field.ChainID:      chainID[:],
             Field.RequestID:    requestID,
             Field.ContainerIDs: containerIDBytes,
         })
 
-    # GetAncestors message
-    @classmethod
+    # GetAncestors message    
     def GetAncestors(chainID, requestID, deadline, containerID):
-        return cls.Pack(Op.GetAncestors, {
+        return Codec.Pack(Op.GetAncestors, {
             Field.ChainID:     chainID[:],
             Field.RequestID:   requestID,
             Field.Deadline:    deadline,
             Field.ContainerID: containerID[:],
         })
 
-    # MultiPut message
-    @classmethod
+    # MultiPut message    
     def MultiPut(chainID, requestID, containers):
-        return cls.Pack(Op.MultiPut, {
+        return Codec.Pack(Op.MultiPut, {
             Field.ChainID:             chainID[:],
             Field.RequestID:           requestID,
             Field.MultiContainerBytes: containers,
         })
 
-    # Get message
-    @classmethod
+    # Get message    
     def Get(chainID, requestID, deadline, containerID):
-        return cls.Pack(Op.Get, {
+        return Codec.Pack(Op.Get, {
             Field.ChainID:     chainID[:],
             Field.RequestID:   requestID,
             Field.Deadline:    deadline,
@@ -142,20 +133,18 @@ class Builder:
         })
     
 
-    # Put message
-    @classmethod
+    # Put message    
     def Put(chainID, requestID, containerID, container):
-        return cls.Pack(Op.Put, {
+        return Codec.Pack(Op.Put, {
             Field.ChainID:        chainID[:],
             Field.RequestID:      requestID,
             Field.ContainerID:    containerID[:],
             Field.ontainerBytes: container,
         })
 
-    # PushQuery message
-    @classmethod
+    # PushQuery message    
     def PushQuery(chainID, requestID, deadline, containerID, container):
-        return cls.Pack(Op.PushQuery, {
+        return Codec.Pack(Op.PushQuery, {
             Field.ChainID:        chainID[:],
             Field.RequestID:      requestID,
             Field.Deadline:       deadline,
@@ -163,25 +152,23 @@ class Builder:
             Field.ContainerBytes: container,
         })
 
-    # PullQuery message
-    @classmethod
+    # PullQuery message    
     def PullQuery(chainID, requestID, deadline, containerID):
-        return cls.Pack(Op.PullQuery, {
+        return Codec.Pack(Op.PullQuery, {
             Field.ChainID:     chainID[:],
             Field.RequestID:   requestID,
             Field.Deadline:    deadline,
             Field.ContainerID: containerID[:],
         })
 
-    # Chits message
-    @classmethod
+    # Chits message    
     def Chits(chainID, requestID, containerIDs):
         containerIDBytes = []
         for containerID in containerIDs:
             copy = containerID
             containerIDBytes[i] = copy[:]
         
-        return cls.Pack(Op.Chits, {
+        return Codec.Pack(Op.Chits, {
             Field.ChainID:      chainID[:],
             Field.RequestID:    requestID,
             Field.ContainerIDs: containerIDBytes,

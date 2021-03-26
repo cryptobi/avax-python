@@ -1,6 +1,11 @@
+#!/usr/bin/python3
+
 # avax-python : Python tools for the exploration of the Avalanche AVAX network.
 #
 # Documentation at https://crypto.bi
+
+# Scratch pad. You can mostly ignore these scripts. Used for temporary testing of random stuff.
+
 
 """
 
@@ -16,19 +21,17 @@ The above copyright notice and this permission notice shall be included in all c
 
 # --#--#--
 
+import avaxpython
+import time
 
-# Interface for parallelization implementations
+def f1(i):
+    print(f"{i} f1 started")
+    time.sleep(2)
+    print(f"{i} f1 finished")
 
-class ParallelDriver:    
+p = avaxpython.parallel()
 
-    def go(self, func, *args, **kargs):        
-        pass
+for i in range(10):
+    p.net_worker().submit(f1, i)
 
-    def stop(self):        
-        pass
-
-    def start(self):        
-        pass
-
-    def join(self):
-        pass
+print("End of loop")

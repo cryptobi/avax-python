@@ -22,17 +22,16 @@ from pathlib import Path
 import os.path as op
 import socket
 import ssl
+from avaxpython import Config as AVAXConfig
 
-CavaxStakingCertFile = ".avalanchego/staking/staker.crt"
-CavaxStakingKeyFile = ".avalanchego/staking/staker.key"
 __context = None
 
 
-def get_cert_key():
-
+def get_cert_key(avax_config: AVAXConfig):
+    """Retrieves a certificate and key file pair for the provided Config object"""
     hdir = str(Path.home())
-    cert_file = op.join(hdir, CavaxStakingCertFile)
-    key_file = op.join(hdir, CavaxStakingKeyFile)
+    cert_file = op.join(hdir, avax_config.get("staker_crt"))
+    key_file = op.join(hdir, avax_config.get("staker_key"))
 
     if not op.isfile(cert_file):
         raise Exception(f"Unable to find certificate file at {cert_file}")
@@ -49,10 +48,17 @@ def ssl_connect(hostname, port):
     return context_singleton().wrap_socket(sock, server_hostname=hostname)
 
 
-def context_singleton():
+def context_singleton(avax_config: AVAXConfig):
+
+    global __context
+
     if __context == None:
-        __context = ssl.create_default_context()
-        cert, key = get_cert_key()
-        __context.load_cert_chain(cert, key)
+        
+        __context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
+        __context.check_hostname = False
+        __context.verify_mode = ssl.CERT_NONE
+        __context.load_cert_chain(certfile=avax_config.get("staker_crt"), keyfile=avax_config.get("staker_key"))
 
 
+    return __context
+    

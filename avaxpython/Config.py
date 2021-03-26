@@ -16,13 +16,27 @@ The above copyright notice and this permission notice shall be included in all c
 
 # --#--#--
 
+import sys
+import logging
+from os import path
+from pathlib import Path
 
 # General avaxpython configuration.
-# Not to be confused with node Config
+# Specific to avax-python, not part of the AVAX implementation.
 
-# default AVAX key size
+
+# Default AVAX key size
 KEY_SIZE = 256
-
+MAX_WORKERS = 1
+NETWORK_WORKERS=8
+DEFAULT_WORKER_MODE = "process" # process or thread
+key_filename = "staker.key"
+crt_filename = "staker.crt"
+DEFAULT_BUFFIZ = 8192
+GO_SRC_PATH = "go/src/github.com/ava-labs/avalanchego"
+GO_BEACONS_PATH = "genesis/beacons.go"
+AVAX_DOTDIR = ".avalanchego"
+AVAX_PYTHON_VERSION = "avax-python/0.0.1"
 
 
 class Config:
@@ -30,5 +44,52 @@ class Config:
     def __init__(self):
         # ParallelDriver to use when not specified
         self.default_parallel_module = 'thread'
+        self.default_config()
+        self.default_logger()
 
+
+    def default_config(self):
+
+        self.conf = {}
+        self.set("home_dir", str(Path.home()))
+        self.set("version", AVAX_PYTHON_VERSION)
+        self.set("avax_sources", path.join(self.get("home_dir"), GO_SRC_PATH))
+        self.set("avax_home", path.join(self.get("home_dir"), AVAX_DOTDIR))
+        self.set("certs_dir", path.join(self.get("avax_home"), "staking"))
+        self.set("staker_key", path.join(self.get("certs_dir"), key_filename))
+        self.set("staker_crt", path.join(self.get("certs_dir"), crt_filename))
+        self.set("beacons_source", path.join(self.get("avax_sources"), GO_BEACONS_PATH))
+        self.set("logging_level", logging.DEBUG)
+        self.set("logging_format", '%(asctime)s %(levelname)s : %(message)s')
+
+
+    def set(self, k, v):
+        self.conf[k] = v
+
+        return self.conf
+
+
+    def get(self, k):
+        if k in self.conf:
+            return self.conf[k]
+
+        return None
+
+
+    def logger(self):
+        if self._logger == None:
+            self.default_logger()
         
+        return self._logger
+
+
+    def default_logger(self):
+        self._logger = logging.getLogger()
+        self._logger.setLevel(self.get("logging_level"))
+        handler = logging.StreamHandler(sys.stdout)
+        handler.setLevel(self.get("logging_level"))
+        formatter = logging.Formatter(self.get("logging_format"))
+        handler.setFormatter(formatter)
+        self._logger.addHandler(handler)
+
+        return self._logger

@@ -26,5 +26,6 @@ PYTHONPATH=$PYTHONPATH:$ppath/3rdparty/bip_utils/
 PYTHONPATH=$PYTHONPATH:$ppath/3rdparty/py_crypto_hd_wallet/py_crypto_hd_wallet/
 PYTHONPATH=$PYTHONPATH:$ppath/3rdparty/python-mnemonic/mnemonic/
 PYTHONPATH=$PYTHONPATH:$ppath/3rdparty/cb58ref/
+PYTHONPATH=$PYTHONPATH:$ppath/3rdparty/x509-parser/
 
 export PYTHONPATH

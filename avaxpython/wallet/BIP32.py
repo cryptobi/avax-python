@@ -38,14 +38,19 @@ def get_preferred_HRP(networkID):
     return "avax"
 
 
-def address_from_publickey(pk):
+def address_from_publickey_bytes(bts):
     m = hashlib.sha256()
-    m.update(pk.ToBytes())
+    m.update(bts)
     sh256 = m.digest()
     n = hashlib.new('ripemd160')
     n.update(sh256)    
     return n.digest()
 
+
+def address_from_publickey(pk):
+    m = hashlib.sha256()
+    return address_from_publickey_bytes(pk.ToBytes())
+    
 
 def address_to_string(hrp, chainId, addr):
     dta = bech32.convertbits(addr, 8, 5, True)

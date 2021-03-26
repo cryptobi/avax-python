@@ -16,18 +16,30 @@ The above copyright notice and this permission notice shall be included in all c
 
 # --#--#--
 
-
+import time
+import socket
 from .Builder import Builder
 from .metrics import metrics as mt
 import avaxpython.utils.logging
 from ..ids import ShortID
 from avaxpython.utils.timer import Executor
 from avaxpython.utils import constants, ip
-from avaxpython.utils.logging import logger
 from avaxpython.utils import logging
+from avaxpython.utils.ip import IPDesc
 from avaxpython.ids.ShortID import ShortID
 from avaxpython.ids.ID import ID
 from avaxpython.version import version
+from avaxpython.network.Messages import Messages
+from avaxpython.network.peer import Peer
+from avaxpython.network.Field import Field
+from avaxpython.network.dialer import Dialer
+from avaxpython.network.Op import Op
+from avaxpython.network.Msg import Msg
+from avaxpython.network.codec import Codec
+from avaxpython.utils.wrappers.Packer import Packer
+from avaxpython import Config
+import avaxpython
+
 
 # All periods in seconds
 defaultInitialReconnectDelay = 1
@@ -51,16 +63,19 @@ defaultConnMeterCacheSize = 10000
 
 class Network:
 
-    def __init__(self,log,id, ip,networkID,version,parser,listener,dialer,serverUpgrader,clientUpgrader,vdrs,beacons,router,nodeID,initialReconnectDelay,maxReconnectDelay,maxMessageSize,sendQueueSize,maxNetworkPendingSendBytes, networkPendingSendBytesToRateLimit,maxClockDifference,peerListGossipSpacing,peerListGossipSize,peerListStakerGossipFraction,getVersionTimeout,allowPrivateIPs,gossipSize,pingPongTimeout,pingFrequency,disconnectedIPs,connectedIPs,retryDelay,myIPs,peers,readBufferSize,readHandshakeTimeout,connMeter,connMeterMaxConns,restartOnDisconnected,connectedCheckerCloser,disconnectedCheckFreq,connectedMeter,restarter,apricotPhase0Time):
-        self.log = log
+    def __init__(self, id = None, ip = None, networkID = None, version = None, parser = None, listener = None, dialer = None, serverUpgrader = None, clientUpgrader = None, vdrs = None, beacons = None, router = None, nodeID = None, initialReconnectDelay = None, maxReconnectDelay = None, maxMessageSize = None, sendQueueSize = None, maxNetworkPendingSendBytes = None, networkPendingSendBytesToRateLimit = None, maxClockDifference = None, peerListGossipSpacing = None, peerListGossipSize = None, peerListStakerGossipFraction = None, getVersionTimeout = None, allowPrivateIPs = None, gossipSize = None, pingPongTimeout = None, pingFrequency = None, disconnectedIPs = {}, connectedIPs = {}, retryDelay = 30, myIPs = {}, peers = {}, readBufferSize = None, readHandshakeTimeout = None, connMeter = None, connMeterMaxConns = None, restartOnDisconnected = None, connectedCheckerCloser = None, disconnectedCheckFreq = None, connectedMeter = None, restarter = None, apricotPhase0Time = None, avax_config = None):
+        
+        self.avax_config = avax_config
+
+        self.futures = [] # manage network futures
         self.metrics = mt()
         self.id = id
-        self.ip =  ip
+        self.ip = ip
         self.networkID = networkID
         self.version = version
         self.parser = parser
         self.listener = listener
-        self.dialer = dialer
+        self.dialer: Dialer = dialer
         self.serverUpgrader = serverUpgrader
         self.clientUpgrader = clientUpgrader
         self.vdrs = vdrs
@@ -87,18 +102,18 @@ class Network:
         self.readBufferSize = readBufferSize
         self.readHandshakeTimeout = readHandshakeTimeout
         self.connMeterMaxConns = connMeterMaxConns
-        self.connMeter = None # TODO 
-        self.executor = None # TODO Executor()
+        self.connMeter = connectedMeter
+        self.executor = avaxpython.parallel().executor()()
         self.b = Builder()
         self.apricotPhase0Time = apricotPhase0Time
         self.stateLock = None # TODO sync.RWMutex
         self.pendingBytes = 0
         self.closed = False
-        self.disconnectedIPs = {}
-        self.connectedIPs = {}
-        self.retryDelay = {}
-        self.myIPs = {}
-        self.peers = {}
+        self.disconnectedIPs = disconnectedIPs
+        self.connectedIPs = connectedIPs
+        self.retryDelay = retryDelay
+        self.myIPs = myIPs
+        self.peers = peers
         self.closeOnce = None
         self.restartOnDisconnected = restartOnDisconnected
         self.connectedCheckerCloser = connectedCheckerCloser
@@ -107,12 +122,61 @@ class Network:
         self.restarter = restarter
         self.hasMasked = True
         self.maskedValidators = {}
+        self.Log = avax_config.logger()
 
+
+    def handle_msg(self, msg):
+        self.avax_config.logger().debug("avax_handle_msg called with {} bytes".format(len(msg)))
+        parsed_msg = Codec.Parse(msg)
+        self.Log.debug(parsed_msg)
+
+
+    def handle_protocol(self, conn):
+
+        while True:
+
+            r = conn.recv(Config.DEFAULT_BUFFIZ)
+
+            if not r:
+                self.avax_config.logger().error("Nothing received from {}:{} . Aborting connection.".format(host_addr, host_port))
+                break
+
+            r_len = len(r)
+
+            if r_len == Packer.IntLen:
+                pak_len = int.from_bytes(r, "big")
+                self.avax_config.logger().debug("Attempting to read {} bytes".format(pak_len))            
+                pak = conn.recv(pak_len)
+                if len(pak) == pak_len:
+                    self.avax_config.logger().debug("Received {} bytes.".format(pak_len))
+                    self.handle_msg(pak)
+                else:
+                    logger.warning("Message size {} and received size {} differ. Message ignored.".format(pak_len, len(pak)))
+
+
+        self.avax_config.logger().debug("Closing connection")
+        conn.close()
+
+
+    def add_peer(self, peer):
+        if self.peers == None:
+            self.peers = []
         
+        self.peers.append(peer)
+
+
+    def connect_peer(self, beacon_hp, beacon_id):
+        self.avax_config.logger().debug("Connecting to {} ID {}".format(beacon_hp, beacon_id))
+        host_addr, host_port = beacon_hp.split(":")
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        conn = self.ssl_context.wrap_socket(s)
+        conn.connect( (host_addr, int(host_port)) )
+        self.handle_protocol(conn)
+
+
     def GetAcceptedFrontier(self, validatorIDs, chainID, requestID, deadline):
 
         msg = self.b.GetAcceptedFrontier(chainID, requestID, uint64(deadline.Sub(n.clock.Time())))
-        self.log.AssertNoError(err)
 
         for peerElement in self.getPeers(validatorIDs):
             peer = peerElement.peer
@@ -128,7 +192,7 @@ class Network:
     
     def AcceptedFrontier(self, validatorID, chainID, requestID, containerIDs):
         msg = self.b.AcceptedFrontier(chainID, requestID, containerIDs)
-        if err != nil: 
+        if err is not None: 
             self.log.Error("failed to build AcceptedFrontier(%s, %d, %s): %s", chainID, requestID, containerIDs, err)
             return # Packing message failed
         
@@ -142,7 +206,7 @@ class Network:
 
     def GetAccepted(self, validatorIDs, chainID, requestID, deadline, containerIDs):
         msg = self.b.GetAccepted(chainID, requestID, uint64(deadline.Sub(n.clock.Time())), containerIDs)
-        if err != nil:
+        if err is not None:
             self.log.Error("failed to build GetAccepted(%s, %d, %s): %s", chainID, requestID, containerIDs, err)
             for validatorID in validatorIDs:
                 vID = validatorID # Prevent overwrite in next loop iteration
@@ -188,7 +252,7 @@ class Network:
                 continue
             
             msg = self.b.PeerList(ips)
-            if err != nil:
+            if err is not None:
                 self.log.Error("failed to build peer list to gossip: %s. len(ips): %d", err, len(ips)) 
                 continue
             
@@ -211,12 +275,12 @@ class Network:
 
             s = sampler.NewUniform()
             err = s.Initialize(uint64(len(stakers)))
-            if err != nil:
+            if err is not None:
                 self.log.Error("failed to select stakers to sample: %s. len(stakers): %d", err, len(stakers))
                 continue
             
             stakerIndices, err = s.Sample(numStakersToSend)
-            if err != nil:
+            if err is not None:
                 self.log.Error("failed to select stakers to sample: %s. len(stakers): %d", err, len(stakers))
                 continue
             
@@ -224,12 +288,12 @@ class Network:
                 stakers[int(index)].Send(msg)
             
             err = s.Initialize(uint64(len(nonStakers)))
-            if err != nil:
+            if err is not None:
                 self.log.Error("failed to select non-stakers to sample: %s. len(nonStakers): %d", err, len(nonStakers))
                 continue
             
             nonStakerIndices, err = s.Sample(numNonStakersToSend)
-            if err != nil:
+            if err is not None:
                 self.log.Error("failed to select non-stakers to sample: %s. len(nonStakers): %d", err, len(nonStakers))
                 continue
             
@@ -241,78 +305,28 @@ class Network:
 
         # go self.gossip()
 
-        def _func():
-            duration = time.Until(n.apricotPhase0Time)
-            time.Sleep(duration)
-
-            self.stateLock.Lock()
-            # # defer self.stateLock.Unlock()
-
-            self.hasMasked = true
-            for vdrID in self.maskedValidators.List():
-                err = self.vdrs.MaskValidator(vdrID)
-                if err != nil:
-                    self.log.Error("failed to mask validator %s due to %s", vdrID, err)
-                        
-            self.maskedValidators.Clear()
-            self.log.Verbo("The new staking set is:\n%s", self.vdrs)
-        
-        # go _func
-
         # Continuously accept new connections
         while True:
-            # Returns error when self.Close() is called
-            conn, err = self.listener.Accept() 
-            if err != nil:
-                netErr, ok = (err)(net.Error)
-                if ok and netErr.Temporary():
-                    # Sleep for a small amount of time to try to wait for the
-                    # temporary error to go away.
-                    time.Sleep(time.Millisecond)
-                    continue
-                
-
-                # When [n].Close() is called, [n.listener].Close() is called.
-                # This causes [n.listener].Accept() to return an error.
-                # If that happened, don't log/return an error here.
-                if self.closed.GetValue():
-                    return errNetworkClosed
-                
-                self.log.Debug("error during server accept: %s", err)
-                return err
             
-            conn, ok = (conn)(*net.TCPConn)
-            if ok:
-                err = conn.SetLinger(0)
-                if err != nil:
-                    self.log.Warn("failed to set no linger due to: %s", err)
-                
-                err = conn.SetNoDelay(true)
-                if err != nil:
-                    self.log.Warn("failed to set socket nodelay due to: %s", err)
-                            
+            # Returns error when self.Close() is called
+            conn = self.listener.accept() 
+            if conn is None:
+                continue                                
 
-            addr = conn.RemoteAddr().String()
-            ticks, err = self.connMeter.Register(addr)
-            # looking for > self.connMeterMaxConns indicating the second tick
-            if err == nil and ticks > self.connMeterMaxConns:
-                self.log.Debug("connection from %s temporarily dropped", addr)
-                _ = conn.Close()
-                continue        
-
-            def _func():
-                channelx = None # TODO criar solucao para canais
-                err = self.upgrade(peer(net = self,conn=conn, tickerCloser=channelx), self.serverUpgrader)
-                if err != nil:
-                    self.log.Verbo("failed to upgrade connection: %s", err)
-                        
-            # go _func
-        
+            if self.closed:
+                # network has been closed. exit loop
+                return
+            
+            self.log.Debug("error during server accept: %s", err)
+            return
+            
+            # spawn thread to handle connection
+            #         
         
 
     def Accepted(self, validatorID, chainID, requestID, containerIDs):
         msg = self.b.Accepted(chainID, requestID, containerIDs)
-        if err != nil:
+        if err is not None:
             self.log.Error("failed to build Accepted(%s, %d, %s): %s", chainID, requestID, containerIDs, err)
             return # Packing message failed
 
@@ -328,7 +342,7 @@ class Network:
     # assumes the stateLock is not held.
     def GetAncestors(self, validatorID, chainID, requestID, deadline, containerID):
         msg = self.b.GetAncestors(chainID, requestID, uint64(deadline.Sub(n.clock.Time())), containerID)
-        if err != nil:
+        if err is not None:
             self.log.Error("failed to build GetAncestors message: %s", err)
             return
 
@@ -345,7 +359,7 @@ class Network:
     # assumes the stateLock is not held.
     def MultiPut(self, validatorID, chainID, requestID, containers):
         msg = self.b.MultiPut(chainID, requestID, containers)
-        if err != nil:
+        if err is not None:
             self.log.Error("failed to build MultiPut message because of container of size %d", len(containers))
             return
 
@@ -376,14 +390,14 @@ class Network:
     # assumes the stateLock is not held.
     def Put(self, validatorID, chainID, requestID, containerID, container):
         msg = self.b.Put(chainID, requestID, containerID, container)
-        if err != nil:
+        if err is not None:
             self.log.Error("failed to build Put(%s, %d, %s): %s. len(container) : %d", chainID, requestID, containerID, err, len(container))
             return
 
         peer = self.getPeer(validatorID)
         if peer == nil or not peer.connected.GetValue() or not peer.Send(msg):
             self.log.Debug("failed to send Put(%s, %s, %d, %s)", validatorID, chainID, requestID, containerID)
-            self.log.Verbo("container: %s", formatting.DumpBytes(Bytes = container))
+            self.log.debug("container: %s", formatting.DumpBytes(Bytes = container))
             self.put.numFailed.Inc()
         else:
             self.put.numSent.Inc()
@@ -395,9 +409,9 @@ class Network:
     def PushQuery(self, validatorIDs, chainID, requestID, deadline, containerID, container):
         msg = self.b.PushQuery(chainID, requestID, uint64(deadline.Sub(n.clock.Time())), containerID, container)
 
-        if err != nil:
+        if err is not None:
             self.log.Error("failed to build PushQuery(%s, %d, %s): %s. len(container): %d", chainID, requestID, containerID, err, len(container))
-            self.log.Verbo("container: %s", formatting.DumpBytes(Bytes=container))
+            self.log.debug("container: %s", formatting.DumpBytes(Bytes=container))
             for validatorID in validatorIDs:
                 vID = validatorID # Prevent overwrite in next loop iteration
                 self.executor.Add(lambda : self.router.QueryFailed(vID, chainID, requestID))
@@ -409,7 +423,7 @@ class Network:
             vID = peerElement.id
             if peer == nil or not peer.connected.GetValue() or not peer.Send(msg):
                 self.log.Debug("failed to send PushQuery(%s, %s, %d, %s)", vID, chainID, requestID, containerID)
-                self.log.Verbo("container: %s", formatting.DumpBytes(Bytes = container))
+                self.log.debug("container: %s", formatting.DumpBytes(Bytes = container))
                 self.executor.Add(lambda : self.router.QueryFailed(vID, chainID, requestID))
                 self.pushQuery.numFailed.Inc()
             else:
@@ -438,7 +452,7 @@ class Network:
     # assumes the stateLock is not held.
     def Chits(self, validatorID, chainID, requestID, votes):
         msg = self.b.Chits(chainID, requestID, votes)
-        if err != nil:
+        if err is not None:
             self.log.Error("failed to build Chits(%s, %d, %s): %s", chainID, requestID, votes, err)
             return
 
@@ -454,9 +468,9 @@ class Network:
     # assumes the stateLock is not held.
     def Gossip(self, chainID, containerID, container):
         err = self.gossipContainer(chainID, containerID, container)
-        if err != nil:
+        if err is not None:
             self.log.Debug("failed to Gossip(%s, %s): %s", chainID, containerID, err)
-            self.log.Verbo("container:\n%s", formatting.DumpBytes(Bytes = container))        
+            self.log.debug("container:\n%s", formatting.DumpBytes(Bytes = container))        
 
 
     # Accept is called after every consensus decision
@@ -509,7 +523,7 @@ class Network:
         close(n.connectedCheckerCloser)
 
         err = self.listener.Close()
-        if err != nil:
+        if err is not None:
             self.log.Debug("closing network listener failed with: %s", err)
 
         if self.closed.GetValue():
@@ -535,14 +549,6 @@ class Network:
             peer.Close() # Grabs the stateLock
     
 
-    # Track implements the Network interface
-    # assumes the stateLock is not held.
-    def Track(self, ip):
-        self.stateLock.Lock()
-        # defer self.stateLock.Unlock()
-        self.track(ip)
-
-
     def IP(self):
         return self.ip.IP()
 
@@ -552,7 +558,7 @@ class Network:
 
         msg = self.b.Put(chainID, constants.GossipMsgRequestID, containerID, container)
 
-        if err != nil:
+        if err is not None:
             return fmt.Errorf("attempted to pack too large of a Put message.\nContainer length: %d", len(container))
         
         allPeers = self.getAllPeers()
@@ -565,12 +571,12 @@ class Network:
         s = sampler.NewUniform()
 
         err = s.Initialize(uint64(len(allPeers)))
-        if err != nil:
+        if err is not None:
             return err        
 
         indices, err = s.Sample(numToGossip)
         
-        if err != nil:
+        if err is not None:
             return err
 
         for index in indices:
@@ -582,183 +588,77 @@ class Network:
         return None
 
 
-    # assumes the stateLock is held.
-    def track(self, ip):
-        if self.closed.GetValue():
-            return
-        
 
-        str = ip.String()
-        _, ok = self.disconnectedIPs[str]
-        if ok:
-            return
-        
-        _, ok = self.connectedIPs[str]
-        if ok:
-            return
-        
-        _, ok = self.myIPs[str]
-        if ok:
-            return
-        
-        self.disconnectedIPs[str] = None
+    def track(self, peer: Peer):
+        """
+        Track connection to a peer. This is different from the Go implementation which tracks an IPDesc. We track a peer.        
+        """
 
-        # TODO
-        #go self.connectTo(ip)
-    
+        if self.closed:
+            return
+                        
+        if peer.ip.IP in self.disconnectedIPs and self.disconnectedIPs[peer.ip.IP]:
+            return        
+        
+        if peer.ip.IP in self.connectedIPs and self.connectedIPs[peer.ip.IP]:
+            return
+        
+        if self.myIPs and peer.ip.IP in self.myIPs[peer.ip.IP]:
+            return
+        
+        self.disconnectedIPs[peer.ip.IP] = None              
+
+        # avaxpython.parallel().go(self.connectTo, ip)
+        self.connectTo(peer)
 
 
 
     # assumes the stateLock is not held. Only returns if the ip is connected to or
     # the network is closed
-    def connectTo(self, ip):
-        str = ip.String()
-        self.stateLock.RLock()
-        delay = self.retryDelay[str]
-        self.stateLock.RUnlock()
+    def connectTo(self, peer: Peer):
+        print(f"connecting to {peer.ip.IP}")                
 
         while True:
-            time.Sleep(delay)
 
-            if delay == 0:
-                delay = self.initialReconnectDelay            
+            conn = self.attemptConnect(peer)
+            if conn is None:
+                self.Log.error(f"connectTo failed connecting to {ip} retrying in {self.retryDelay}s")
+                time.sleep(self.retryDelay)
 
-            # Randomization is only performed here to distribute reconnection
-            # attempts to a node that previously shut down. This doesn't require
-            # cryptographically secure random number generation.
-            delay = None # TODO time.Duration(float64(delay) * (1 + rand.Float64())) # #nosec G404
-            if delay > self.maxReconnectDelay:
-                # set the timeout to [.75, 1) * maxReconnectDelay
-                delay = None # TODO time.Duration(float64(n.maxReconnectDelay) * (3 + rand.Float64()) / 4) # #nosec G404            
-
-            self.stateLock.Lock()
-            _, isDisconnected = self.disconnectedIPs[str]
-            _, isConnected = self.connectedIPs[str]
-            _, isMyself = self.myIPs[str]
-            closed = self.closed
-
-            if not isDisconnected or isConnected or isMyself or closed.GetValue():
-                # If the IP was discovered by the peer connecting to us, we don't
-                # need to attempt to connect anymore
-                # If the IP was discovered to be our IP address, we don't need to
-                # attempt to connect anymore
-                # If the network was closed, we should stop attempting to connect
-                # to the peer
-
-                self.stateLock.Unlock()
-                return
+            self.handle_protocol(conn)            
             
-            self.retryDelay[str] = delay
-            self.stateLock.Unlock()
-
-            err = self.attemptConnect(ip)
-            if err == nil:
-                return
-            
-            self.log.Verbo("error attempting to connect to %s: %s. Reattempting in %s", ip, err, delay)
     
 
     # assumes the stateLock is not held. Returns nil if a connection was able to be
     # established, or the network is closed.
-    def attemptConnect(self, ip):
-        self.log.Verbo("attempting to connect to %s", ip)
+    def attemptConnect(self, peer: Peer):            
 
-        conn, err = self.dialer.Dial(ip)
-        if err != nil:
-            return err
-        
-        conn, ok = (conn)(*net.TCPConn)
-        if ok:
-            err = conn.SetLinger(0)
-            if err != nil:
-                self.log.Warn("failed to set no linger due to: %s", err)
+        self.log.debug(f"Attempting to connect to {peer.ip}")
+
+        conn = self.dialer.Dial(peer.ip)
+
+        if conn is None:
+            raise Exception(f"Cannot connect to {peer.ip}")                
             
-            err = conn.SetNoDelay(true)
-            if err != nil:
-                self.log.Warn("failed to set socket nodelay due to: %s", err)
+        self.tryAddPeer(peer)
             
-        p1 = peer(net=self,ip=ip,conn=conn,tickerCloser=None)
-        return self.upgrade(p1, self.clientUpgrader)
-    
+        return conn
 
-    # assumes the stateLock is not held. Returns an error if the peer's connection
-    # wasn't able to be upgraded.
-    def upgrade(self, p, upgrader):
-        err = p.conn.SetReadDeadline(time.Now().Add(n.readHandshakeTimeout))
-        if err != nil:
-            _ = p.conn.Close()
-            self.log.Verbo("failed to set the read deadline with %s", err)
-            return err        
-
-        id, conn, err = upgrader.Upgrade(p.conn)
-        if err != nil:
-            _ = p.conn.Close()
-            self.log.Verbo("failed to upgrade connection with %s", err)
-            return err
-
-        err = conn.SetReadDeadline(time.Time())
-        if err != nil:
-            _ = p.conn.Close()
-            self.log.Verbo("failed to clear the read deadline with %s", err)
-            return err
-
-        p.sender = make(chan, self.sendQueueSize)
-        p.id = id
-        p.conn = conn
-
-        err = self.tryAddPeer(p)
-        if err != nil:
-            _ = p.conn.Close()
-            self.log.Debug("dropping peer connection due to: %s", err)
-
-        return None
-    
 
     # assumes the stateLock is not held. Returns an error if the peer couldn't be
     # added.
     def tryAddPeer(self, p):
-        self.stateLock.Lock()
-        # defer self.stateLock.Unlock()
-
+        
         ip = p.getIP()
 
-        if self.closed.GetValue():
-            # the network is closing, so make sure that no further reconnect
-            # attempts are made.
-            return errNetworkClosed        
-
-        # if this connection is myself, then I should delete the connection and
-        # mark the IP as one of mine.
-        if p.id == self.id:
-            if not ip.IsZero(): 
-                # if self.ip is less useful than p.ip set it to this IP
-                if self.ip.IP().IsZero():
-                    self.log.Info("setting my ip to %s because I was able to connect to myself through this channel", p)
-                
-            ip.String()
-            delete(n.disconnectedIPs, str)
-            delete(n.retryDelay, str)                
-            
-            return errPeerIsMyself
-        
-
-        # If I am already connected to this peer, then I should close this new
-        # connection.
-        _, ok = self.peers[p.id]
-        if ok:
-            if not ip.IsZero():
-                str = ip.String()
-                delete(n.disconnectedIPs, str)
-                delete(n.retryDelay, str)
-
-            return fmt.Errorf("duplicated connection from %s at %s", p.id.PrefixedString(constants.NodeIDPrefix), ip)
+        if self.closed:
+            raise Exception("Network is closed.")        
 
         self.peers[p.id] = p
-        self.numPeers.Set(float64(len(n.peers)))
+        self.numPeers = len(self.peers)
         p.Start()
 
-        return None
-    
+
 
     # assumes the stateLock is not held. Returns the ips of connections that have
     # valid IPs that are marked as validators.
@@ -792,14 +692,14 @@ class Network:
         if self.hasMasked:
                 if peerVersion.Before(minimumUnmaskedVersion):
                     err = self.vdrs.MaskValidator(p.id)
-                    if err != nil:
+                    if err is not None:
                         self.log.Error("failed to mask validator %s due to %s", p.id, err)
                     else:
                         err = self.vdrs.RevealValidator(p.id)
-                        if err != nil:
+                        if err is not None:
                             self.log.Error("failed to reveal validator %s due to %s", p.id, err)
                         
-                    self.log.Verbo("The new staking set is:\n%s", self.vdrs)
+                    self.log.debug("The new staking set is:\n%s", self.vdrs)
                 else:
                     peerVersion.Before(minimumUnmaskedVersion)
                     self.maskeValidators.Add(p.id)
@@ -907,7 +807,7 @@ class Network:
                 
                 self.stateLock.RLock()
                 for peer in self.peers:
-                    if peer != nil and peer.connected.GetValue():
+                    if peer is not None and peer.connected.GetValue():
                         self.connectedMeter.Tick()
                         break
                     
@@ -924,114 +824,15 @@ class Network:
                 return
     
 
-# NewDefaultNetwork returns a new Network implementation with the provided
-# parameters and some reasonable default values.
-def NewDefaultNetwork(registerer, log, id, ip, networkID, version, parser, listener, dialer, serverUpgrader, clientUpgrader, vdrs, beacons, router, connMeterResetDuration, connMeterMaxConns, restarter, restartOnDisconnected, disconnectedCheckFreq, disconnectedRestartTimeout, apricotPhase0Time, sendQueueSize):
-	return NewNetwork(
-		registerer,
-		log,
-		id,
-		ip,
-		networkID,
-		version,
-		parser,
-		listener,
-		dialer,
-		serverUpgrader,
-		clientUpgrader,
-		vdrs,
-		beacons,
-		router,
-		defaultInitialReconnectDelay,
-		defaultMaxReconnectDelay,
-		DefaultMaxMessageSize,
-		sendQueueSize,
-		defaultMaxNetworkPendingSendBytes,
-		defaultNetworkPendingSendBytesToRateLimit,
-		defaultMaxClockDifference,
-		defaultPeerListGossipSpacing,
-		defaultPeerListGossipSize,
-		defaultPeerListStakerGossipFraction,
-		defaultGetVersionTimeout,
-		defaultAllowPrivateIPs,
-		defaultGossipSize,
-		defaultPingPongTimeout,
-		defaultPingFrequency,
-		defaultReadBufferSize,
-		defaultReadHandshakeTimeout,
-		connMeterResetDuration,
-		defaultConnMeterCacheSize,
-		connMeterMaxConns,
-		restarter,
-		restartOnDisconnected,
-		disconnectedCheckFreq,
-		disconnectedRestartTimeout,
-		apricotPhase0Time,
-	)
 
+def listener(host, port):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    
+    bind_host = host
+    if bind_host is None:
+        bind_host = "0.0.0.0"
+        
+    s.bind( (bind_host, port) )
+    s.listen()
 
-# NewNetwork returns a new Network implementation with the provided parameters.
-def NewNetwork(registerer, log, id, ip, networkID, version, parser, listener, dialer, serverUpgrader, clientUpgrader, vdrs, beacons, router, initialReconnectDelay, maxReconnectDelay, maxMessageSize, sendQueueSize, maxNetworkPendingSendBytes, networkPendingSendBytesToRateLimit, maxClockDifference, peerListGossipSpacing, peerListGossipSize, peerListStakerGossipFraction, getVersionTimeout, allowPrivateIPs, gossipSize, pingPongTimeout, pingFrequency, readBufferSize, readHandshakeTimeout, connMeterResetDuration, connMeterCacheSize, connMeterMaxConns, restarter, restartOnDisconnected, disconnectedCheckFreq, disconnectedRestartTimeout, apricotPhase0Time):
-
-	netw = Network(
-		log=log,
-		id=id,
-		ip=ip,
-		networkID=networkID,
-		version=version,
-		parser=parser,
-		listener=listener,
-		dialer=dialer,
-		serverUpgrader=serverUpgrader,
-		clientUpgrader=clientUpgrader,
-		vdrs=vdrs,
-		beacons=beacons,
-		router=router,
-		nodeID=0, # TODO rand.Uint32(),
-		initialReconnectDelay=initialReconnectDelay,
-		maxReconnectDelay=maxReconnectDelay,
-		maxMessageSize=0, # TODO int64(maxMessageSize),
-		sendQueueSize=sendQueueSize,
-		maxNetworkPendingSendBytes=0, # TODO int64(maxNetworkPendingSendBytes),
-		networkPendingSendBytesToRateLimit=0, # TODO int64(networkPendingSendBytesToRateLimit),
-		maxClockDifference=maxClockDifference,
-		peerListGossipSpacing=peerListGossipSpacing,
-		peerListGossipSize=peerListGossipSize,
-		peerListStakerGossipFraction=peerListStakerGossipFraction,
-		getVersionTimeout=getVersionTimeout,
-		allowPrivateIPs=allowPrivateIPs,
-		gossipSize=gossipSize,
-		pingPongTimeout=pingPongTimeout,
-		pingFrequency=pingFrequency,
-		disconnectedIPs={},
-		connectedIPs={},
-		retryDelay={},
-		myIPs={},
-		peers={},
-		readBufferSize=readBufferSize,
-		readHandshakeTimeout=readHandshakeTimeout,
-		connMeter=None, # TODO NewConnMeter(connMeterResetDuration, connMeterCacheSize),
-		connMeterMaxConns=connMeterMaxConns,
-		restartOnDisconnected=restartOnDisconnected,
-		connectedCheckerCloser=None, # TODO channel
-		disconnectedCheckFreq=disconnectedCheckFreq,
-		connectedMeter=None, # TODO timer.TimedMeter{Duration: disconnectedRestartTimeout},
-		restarter=restarter,
-		apricotPhase0Time=apricotPhase0Time
-    )
-
-    # TODO metrics err = netw.initialize(registerer)
-	# if err != nil:
-	#	log.Warn("initializing network metrics failed with: %s", err)
-	
-	# TODO netw.executor.Initialize()
-	# TODO go netw.executor.Dispatch()
-	netw.heartbeat()
-
-	if restartOnDisconnected and disconnectedCheckFreq != 0 and disconnectedRestartTimeout != 0:
-		log.Info("node will restart if not connected to any peers")
-		# pre-queue one tick to avoid immediate shutdown.
-		netw.connectedMeter.Tick()
-		# go netw.restartOnDisconnect()
-	
-	return netw
+    return s

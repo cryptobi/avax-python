@@ -16,19 +16,27 @@ The above copyright notice and this permission notice shall be included in all c
 
 # --#--#--
 
-
-from . import ID
-
-class ShortID:
-    """160 bit ID"""
-    __AVAX_SHORTID_LENGTH = 20
-
-    def __init__(self, bts = None):
-        if bts is None:
-            self.bytes = bytearray([0] * ShortID.__AVAX_SHORTID_LENGTH)
-        else:
-            self.bytes = bts
+from avaxpython.parallel import Parallel
+from avaxpython import Config
 
 
-    def __repr__(self):
-        return self.bytes.hex()
+__parallel = None
+
+
+def parallel(md = Config.DEFAULT_WORKER_MODE):
+
+    """
+
+    Parallelization singleton. 
+    Loads an Executor the first time using the specified mode. 
+    Then on future calls mode parameter is ignored.
+
+    """
+
+    global __parallel
+
+    if __parallel == None:
+        __parallel = Parallel.Parallel(md)
+
+    return __parallel
+

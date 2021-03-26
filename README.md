@@ -10,6 +10,8 @@ Visit the [crypto.bi AVAX section](https://crypto.bi/category/avax/) for code sa
 ## Requirements
 
     sudo pip3 install numpy
+    sudo pip3 install pyopenssl
+    sudo pip3 install cryptography
 
 If you plan on generating the python files from `api.specification`, then `spec2py.py` requires `TatSu`
 
@@ -32,6 +34,7 @@ Specifically, this project includes code from the following libraries under the 
 * [pysha3](https://github.com/tiran/pysha3) 
 * [cb58ref](https://github.com/moreati/cb58ref)
 * [bech32 Encoding under wallet/bech32](https://github.com/sipa/bech32)
+
 
 ## Installation
 
@@ -177,6 +180,8 @@ This project includes source code from :
 [cb58ref](https://github.com/moreati/cb58ref) : MIT License
 
 [bech32 Encoding under wallet/bech32](https://github.com/sipa/bech32) : by Pieter Wuille, License unspecified, MIT License Presumed
+
+
 
 
 ## Legal Notices

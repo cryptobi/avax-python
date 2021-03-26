@@ -1,6 +1,10 @@
+#!/usr/bin/python3
+
 # avax-python : Python tools for the exploration of the Avalanche AVAX network.
 #
 # Documentation at https://crypto.bi
+
+# Scratch pad. You can mostly ignore these scripts. Used for temporary testing of random stuff.
 
 """
 
@@ -16,19 +20,17 @@ The above copyright notice and this permission notice shall be included in all c
 
 # --#--#--
 
+import avaxpython
+import time
 
-from . import ID
+def f1(i):
+    print(f"{i} f1 started")
+    time.sleep(2)
+    print(f"{i} f1 finished")
 
-class ShortID:
-    """160 bit ID"""
-    __AVAX_SHORTID_LENGTH = 20
+p = avaxpython.parallel()
 
-    def __init__(self, bts = None):
-        if bts is None:
-            self.bytes = bytearray([0] * ShortID.__AVAX_SHORTID_LENGTH)
-        else:
-            self.bytes = bts
+for i in range(10):
+    p.go(f1, i)
 
-
-    def __repr__(self):
-        return self.bytes.hex()
+print("End of loop")

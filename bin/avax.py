@@ -1,6 +1,10 @@
+#!/usr/bin/python3
+
 # avax-python : Python tools for the exploration of the Avalanche AVAX network.
 #
 # Documentation at https://crypto.bi
+
+# avax.py - Standalone experimental AVAX client. Not a full node, just a passive network listener.
 
 """
 
@@ -17,15 +21,25 @@ The above copyright notice and this permission notice shall be included in all c
 # --#--#--
 
 
-from threading import Thread, Lock, Condition
-from .ParallelDriver import ParallelDriver
+from avaxpython.Config import Config as AVAXConfig
+from avaxpython.node.node import Node
+from avaxpython.node.Config import Config as NodeConfig
 
-class MP(ParallelDriver):
 
-    def __init__(self, tp):
-        
-        if not tp in self._tp_map:
-            raise Exception("Unknown parallelization type.")
+#
+# Getting ready to run avax.py :
+#
+# Download and build the official AVAX implementation in Go
+# cd ~/go/src/github.com/ava-labs/
+# git clone https://github.com/ava-labs/avalanchego.git
+# cd avalanchego
+#
+# Run the Go client once to generate the needed certs and data directory.
+#
 
-        cls = self._tp_map[tp]
-        self.tp = cls()
+node_config = NodeConfig()
+avax_config = AVAXConfig()
+logger = avax_config.logger()
+node = Node(avax_config=avax_config)
+node.Initialize(node_config, avax_config)
+node.Dispatch()

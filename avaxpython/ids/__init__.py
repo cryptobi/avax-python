@@ -17,9 +17,17 @@ The above copyright notice and this permission notice shall be included in all c
 # --#--#--
 
 
+import hashlib
 from avaxpython.ids.ID import ID
-from avaxpython.ids import ShortID
-from avaxpython.ids import ID
+from avaxpython.ids.ShortID import ShortID
+
+
 
 def Empty():
     return ID()
+
+
+def ToShortID(bts):
+    n = hashlib.new('ripemd160')
+    n.update(bts)    
+    return ShortID(n.digest())

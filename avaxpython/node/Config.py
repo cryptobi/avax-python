@@ -20,12 +20,14 @@ The above copyright notice and this permission notice shall be included in all c
 # AVAX node configuration.
 # Not to be confused with general Config at library root 
 
+from avaxpython.utils.ip import DynamicIPDesc
+
 # Config contains all of the configurations of an Avalanche node.
 class Config:
 
     def __init__(self):
-        self.EnableP2PTLS = True        
 
+        self.EnableP2PTLS = True        
         self.TxFee=0
         # Transaction fee for transactions that create new state
         self.CreationTxFee=0
@@ -76,7 +78,8 @@ class Config:
         self.DB = None # TODO database.Database
 
         # Staking configuration
-        self.StakingIP = None # TODO             utils.DynamicIPDesc
+        # TODO obtain IP : port from configuration
+        self.StakingIP : DynamicIPDesc = DynamicIPDesc("0.0.0.0", 9651)
         self.EnableP2PTLS = True # TODO          bool
         self.EnableStaking = True # TODO         bool
         self.StakingKeyFile = "" # TODO        string

@@ -27,13 +27,27 @@ class Msg:
         self.bytes = bytes
 
 
+    def __repr__(self) -> str:
+
+        dct = {
+            'op': self.op,
+            'op_name': Op.String(self.op),
+            'fields': self.fields,
+            'msg_size': len(self.bytes)
+        }
+
+        return "network.Msg " + str(dct)
+
+
     # Field returns the value of the specified field in this message
     def Op(self): 
         return self.op 
 
+
     # Field returns the value of the specified field in this message
     def Get(self, field):
         return self.fields[field]
+
 
     # Bytes returns this message in bytes
     def Bytes(self):
