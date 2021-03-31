@@ -25,6 +25,9 @@ from avaxpython.utils.ip import DynamicIPDesc
 # Config contains all of the configurations of an Avalanche node.
 class Config:
 
+    HTTP_PORT = 9650
+    STAKING_PORT = 9651
+
     def __init__(self):
 
         self.EnableP2PTLS = True        

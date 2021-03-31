@@ -20,6 +20,7 @@ The above copyright notice and this permission notice shall be included in all c
 from .Op import Op
 from .Field import Field
 from .codec import Codec
+from avaxpython.utils.ip import IPDesc
 
 class Builder:
 
@@ -31,7 +32,7 @@ class Builder:
         return Codec.Pack(Op.GetVersion)
 
     
-    def Version(self, networkID, nodeID, myTime, ip, myVersion):
+    def Version(self, networkID, nodeID, myTime, ip: IPDesc, myVersion):
         return Codec.Pack(Op.Version, {
             Field.NetworkID:  networkID,
             Field.NodeID:     nodeID,
@@ -45,16 +46,18 @@ class Builder:
         return Codec.Pack(Op.GetPeerList)
 
     
-    def PeerList(ipDescs):
-        return Codec.Pack(Op.PeerList, {Peers: ipDescs})
+    def PeerList(self, ipDescs):
+        return Codec.Pack(Op.PeerList, {
+            Field.Peers: ipDescs
+        })
 
     
-    def Ping(): 
-        return Codec.Pack(Op.Ping, nil)
+    def Ping():
+        return Codec.Pack(Op.Ping)
 
     
     def Pong(): 
-        return Codec.Pack(Op.Pong, nil)
+        return Codec.Pack(Op.Pong)
 
     # GetAcceptedFrontier message    
     def GetAcceptedFrontier(chainID, requestID, deadline):

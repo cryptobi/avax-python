@@ -18,29 +18,36 @@ The above copyright notice and this permission notice shall be included in all c
 
 
 from .Op import Op
+from .Field import Field
 
 class Msg:
 
-    def __init__(self, op, fields, bytes):
+    def __init__(self, op, fields, data_bytes):
         self.op = op 
-        self.fields = fields # map[Field]interface{}
-        self.bytes = bytes
+        self.fields = fields
+        self.bytes = data_bytes
 
 
     def __repr__(self) -> str:
 
+        field_desc = {}
+        for f in self.fields:
+            k = "{}({})".format(Field.String(f), f)
+            field_desc[k] = self.fields[f]
+
         dct = {
             'op': self.op,
             'op_name': Op.String(self.op),
-            'fields': self.fields,
-            'msg_size': len(self.bytes)
+            'fields': field_desc,
+            'msg_size': len(self.bytes),
+            'bytes': self.bytes.hex()
         }
 
         return "network.Msg " + str(dct)
 
 
     # Field returns the value of the specified field in this message
-    def Op(self): 
+    def Op(self):
         return self.op 
 
 

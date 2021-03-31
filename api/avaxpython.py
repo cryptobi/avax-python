@@ -53,4 +53,4 @@ def get_caller():
 def get_poster():
     src_caller = inspect.stack()[1]
     module_name = inspect.getmodule(src_caller[0])    
-    return make_poster(avaxconfig.urls[module_name])    
+    return make_poster(avaxconfig.urls[module_name])

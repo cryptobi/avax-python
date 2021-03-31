@@ -4,7 +4,7 @@
 #
 # Documentation at https://crypto.bi
 
-# avax.py - Standalone experimental AVAX client. Not a full node, just a passive network listener.
+# Scratch pad. You can mostly ignore these scripts. Used for temporary testing of random stuff.
 
 """
 
@@ -20,42 +20,21 @@ The above copyright notice and this permission notice shall be included in all c
 
 # --#--#--
 
+from avaxpython.network.codec import Codec
+from avaxpython.utils.wrappers.Packer import Packer
+from avaxpython.network.Messages import Messages
+from avaxpython.network.Op import Op
 
-from avaxpython.Config import Config as AVAXConfig
-from avaxpython.network import ip
-from avaxpython.utils.ip import IPDesc
-from avaxpython.node.node import Node
-from avaxpython.node.Config import Config as NodeConfig
-import signal
-import sys
+messages = [
+    [0x01, 0x00, 0x00, 0x00, 0x01, 0xf7, 0xcb, 0xfb,
+     0xc5, 0x00, 0x00, 0x00, 0x00, 0x60, 0x64, 0x65,
+     0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+     0x00, 0x00, 0x00, 0xff, 0xff, 0xc0, 0xa8, 0x01,
+     0xf1, 0x25, 0xb3, 0x00, 0x0f, 0x61, 0x76, 0x61,
+     0x6c, 0x61, 0x6e, 0x63, 0x68, 0x65, 0x2f, 0x31,
+     0x2e, 0x33, 0x2e, 0x31],
+]
 
-
-#
-# Getting ready to run avax.py :
-#
-# Download and build the official AVAX implementation in Go
-# cd ~/go/src/github.com/ava-labs/
-# git clone https://github.com/ava-labs/avalanchego.git
-# cd avalanchego
-#
-# Run the Go client once to generate the needed certs and data directory.
-#
-
-node_config = NodeConfig()
-avax_config = AVAXConfig()
-logger = avax_config.logger()
-
-stk_ip = ip.get_internal_ip()
-node_config.StakingIP = IPDesc(stk_ip.ip, NodeConfig.STAKING_PORT)
-
-node = Node(avax_config=avax_config)
-
-def signal_handler(sig, frame):
-    logger.info("Stopping the AVAX node.")
-    node.Shutdown()
-    sys.exit(0)
-
-signal.signal(signal.SIGINT, signal_handler)
-
-node.Initialize(node_config, avax_config)
-node.Dispatch()
+for msg_bytes in messages:
+    parsed_msg = Codec.Parse(bytes(msg_bytes))
+    print(parsed_msg)

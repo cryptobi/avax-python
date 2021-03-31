@@ -19,6 +19,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 import json
 import time
+import random
 import avaxpython
 from ..version import version
 from cryptography import x509
@@ -40,6 +41,8 @@ from avaxpython.node.Config import Config as NodeConf
 from avaxpython.errors import errors
 from avaxpython.wallet import BIP32
 from avaxpython import ids
+from avaxpython.network.Builder import Builder
+
 
 TCP = "tcp"
 genesisHashKey = b"genesisID"
@@ -165,13 +168,14 @@ class Node:
     
         
         self.Net = Network(avax_config = self.avax_config)
-        self.Net.listener = network.listener(None, self.Config.StakingIP.IP().Port)        
+        self.Net.listener = network.listener(None, self.Config.StakingIP.Port)        
         self.Net.dialer = dialer.NewDialer(self.avax_config)
         self.Net.log = self.Log
         self.Net.serverUpgrader = serverUpgrader
         self.Net.clientUpgrader = clientUpgrader
         self.Net.beacons = self.beacons
-
+        self.Net.b = Builder()
+        self.Net.nodeID = random.randint(9999, 4294967295)
 
 
     # Dispatch starts the node's servers.
@@ -185,11 +189,12 @@ class Node:
 
             host_addr, host_port = beacon_hp.split(":")
 
-            p = Peer(self.Net, conn = None, ip = IPDesc(host_addr, int(host_port)), port = int(host_port))
+            p = Peer(self.Net, conn = None, ip = IPDesc(host_addr, int(host_port)), port = int(host_port), node = self, avax_config=self.avax_config)
+
             self.Config.BootstrapPeers.append(p)
 
         for peer in self.Config.BootstrapPeers:
-            if not peer.ip == self.Config.StakingIP.IP():
+            if peer.ip.IP != self.Config.StakingIP.IP:
                 self.Net.track(peer)
                 pass
             else:
@@ -200,10 +205,6 @@ class Node:
                 print(fut)
 
             time.sleep(5)                
-
-
-        # Start P2P connections     
-        #    
 
         self.Net.Dispatch()
         
@@ -333,7 +334,6 @@ class Node:
         pass
 
 
-    # Initialize this node
     def Initialize(self, config, avax_config):
         
         self.Config = config
@@ -349,34 +349,16 @@ class Node:
         
 
 
-    # Shutdown this node
-    # May be called multiple times
     def Shutdown(self):
-        # self.shuttingDown.SetValue(True)
-        # self.shutdownOnce.Do(n.shutdown)
-        pass
+        self.shuttingDown = True
+        self.shutdown()
 
 
     def shutdown(self):
-        self.Log.info("shutting down node")
-        if self.IPCs != None     :
-            err = self.IPCs.Shutdown()
-            if  err != None :
-                self.Log.debug("error during IPC shutdown: %s")
+        self.Log.info("Running node Shutdown routine.")
 
-
-        if self.chainManager != None:
-            self.chainManager.Shutdown()
-
-        if self.Net != None  :
-            # Close already logs its own error if one occurs, so the error is ignored here
-            _ = self.Net.Close()
-
-        err = self.APIServer.Shutdown()
-        if  err != None  :
-            self.Log.debug("error during API shutdown: %s")
-
-        utils.ClearSignals(n.nodeCloser)
-        self.doneShuttingDown.Done()
-        self.Log.info("finished node shutdown")
+        if self.Net is not None:
+            self.Net.Close()
+                        
+        self.Log.info("Finished node Shutdown()")
 

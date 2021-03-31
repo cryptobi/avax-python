@@ -71,10 +71,10 @@ class metrics:
 
     def initialize(registerer):
 
-        m.numPeers = prometheus.NewGauge(prometheus.GaugeOpts(Namespace=constants.PlatformName, Name="peers", Help="Number of network peers"))
+        m.num_peers = prometheus.NewGauge(prometheus.GaugeOpts(Namespace=constants.PlatformName, Name="peers", Help="Number of network peers"))
 
         errs = wrappers.Errs()
-        err = registerer.Register(m.numPeers)
+        err = registerer.Register(m.num_peers)
         if err != nil:
             errs.Add(fmt.Errorf("failed to register peers statistics due to %s", err))
         

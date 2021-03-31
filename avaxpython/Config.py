@@ -37,7 +37,7 @@ GO_SRC_PATH = "go/src/github.com/ava-labs/avalanchego"
 GO_BEACONS_PATH = "genesis/beacons.go"
 AVAX_DOTDIR = ".avalanchego"
 AVAX_PYTHON_VERSION = "avax-python/0.0.1"
-
+AVAX_NETWORK_VERSION = "avalanche/1.3.1"
 
 class Config:
 

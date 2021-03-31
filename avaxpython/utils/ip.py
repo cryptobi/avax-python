@@ -43,9 +43,10 @@ def init():
 		privateIPBlocks.append(block)
 
 
+# TODO
 def ToIPDesc(ip_string):
 	host, portStr, err = net.SplitHostPort(str)
-	if err != nil:
+	if err != None:
 		return IPDesc(), errBadIP
 	
 	port = int(portStr)	
@@ -59,17 +60,26 @@ def ToIPDesc(ip_string):
 
 class IPDesc:
 
-	def __init__(self, ip, pt):
-		self.addr = ipaddress.ip_address(ip)
-		self.port = pt
-		
+	V4 = 4
+	V6 = 16
 
-
-class IPDesc:
-
-	def __init__(self, IP, Port):
+	def __init__(self, IP: str, Port: int, Version = V4):
 		self.IP = IP
 		self.Port = Port
+		self.version = Version
+
+	def To16(self) -> bytes:
+		ipaddr = ipaddress.ip_address(self.IP)
+		pkt = ipaddr.packed
+		if len(pkt) == 4:
+			bts = bytearray([0] * 12)
+			bts.extend(pkt)
+			return bytes(bts)
+		elif len(pkt) == 16:
+			return pkt
+		else:
+			raise Exception(f"Unknown IP format {self.IP} binary {pkt}")
+
 
 
 	def __repr__(self):

@@ -21,7 +21,7 @@ from .Field import Field
 from .Messages import Messages
 from avaxpython.utils.wrappers.Packer import Packer
 from avaxpython.network.Msg import Msg
-
+from avaxpython.network.Field import Field
 
 # Codec defines the serialization and deserialization of network messages
 class Codec:
@@ -31,6 +31,7 @@ class Codec:
     @staticmethod
     def Pack(op, fields):
         message = Messages.get(op)
+
         if not message:
             return None
 
@@ -39,28 +40,38 @@ class Codec:
 
         for field in message:
             data = fields[field]
-            if not data:
-                return None
+
+            if data is None:
+                raise Exception(f"Message op {op} missing field {field}")
             
-            Packer(field)(p, data)
+            packer = Field.Packer(field)
+
+            if not packer:
+                    raise Exception(f"Packer not found for field {field}")
+
+            packer(p, data)
+
         
-        return Msg(op, fields, p.Bytes())
-        
-    
+        return Msg(op, fields, p.Bytes)
+
+
     # Parse attempts to convert bytes into a message.
     # The first byte of the message is the opcode of the message.
     @staticmethod
-    def Parse(msg):
-        opcode = msg[0]    
+    def Parse(msg: bytes):
+
+        opcode = msg[0]
         fields = {}
-    
+
         msg_fields = Messages.get(opcode)
         packer = Packer(msg)
+        packer.Offset = 1
 
         for field in msg_fields:
             unpacker = Field.Unpacker(field)
-            fields[field] = unpacker(packer)        
-        
-        return Msg(opcode, fields, msg)
+            if not unpacker:
+                raise Exception(f"Unpacker not found for field {field}")
 
-    
+            fields[field] = unpacker(packer)
+
+        return Msg(opcode, fields, msg)

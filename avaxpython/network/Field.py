@@ -37,7 +37,6 @@ class Field:
     ContainerIDs = 11
     MultiContainerBytes = 12
 
-    # estao no packer
     __op_packer = {
         VersionStr: Packer.TryPackStr,
         NetworkID: Packer.TryPackInt,
@@ -45,7 +44,7 @@ class Field:
         MyTime: Packer.TryPackLong,
         IP: Packer.TryPackIP,
         Peers: Packer.TryPackIPList,
-        ChainID: None, # TODO: This will be shortened to use a modified varint spec Packer.TryPackHash
+        ChainID: Packer.TryPackHash,
         RequestID: Packer.TryPackInt,
         Deadline: Packer.TryPackLong,
         ContainerID: Packer.TryPackHash,
@@ -61,13 +60,13 @@ class Field:
         MyTime: Packer.TryUnpackLong,
         IP: Packer.TryUnpackIP,
         Peers: Packer.TryUnpackIPList,
-        ChainID: None, # TODO: This will be shortened to use a modified varint spec Packer.TryUnpackHash
+        ChainID: Packer.TryUnpackHash,
         RequestID: Packer.TryUnpackInt,
         Deadline: Packer.TryUnpackLong,
         ContainerID: Packer.TryUnpackHash,
         ContainerBytes: Packer.TryUnpackBytes,
         ContainerIDs: Packer.TryUnpackHashes,
-        MultiContainerBytes: Packer.TryUnpack2DBytes    
+        MultiContainerBytes: Packer.TryUnpack2DBytes
     }
 
     __op_string = {
@@ -92,7 +91,7 @@ class Field:
     def Packer(cls, field):
         if field in cls.__op_packer:
             return cls.__op_packer.get(field)
-    
+
         raise Exception(f"Field {field} not found")
 
 
@@ -102,7 +101,7 @@ class Field:
     def Unpacker(cls, field):
         if field in cls.__op_unpacker:
             return cls.__op_unpacker.get(field)
-    
+
         raise Exception(f"Field {field} not found")
 
 
@@ -110,5 +109,6 @@ class Field:
     def String(cls, field):
         if field in cls.__op_string: 
             return cls.__op_string.get(field)
-    
+
         raise Exception(f"Field {field} not found")
+

@@ -66,3 +66,9 @@ class Op:
             return cls.__op.get(op)
     
         raise Exception(f"Op {op} not found")
+
+
+    @classmethod
+    def OpNames(cls):
+        return [cls.__op[x] for x in cls.__op]
+        
