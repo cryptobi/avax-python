@@ -17,6 +17,7 @@ The above copyright notice and this permission notice shall be included in all c
 # --#--#--
 
 
+import ipaddress
 from avaxpython.utils.ip import IPDesc
 from avaxpython.utils import nlimits
 from avaxpython.utils.hashing import hashing
@@ -162,9 +163,9 @@ class Packer:
         size = p.UnpackInt()
         return p.UnpackFixedBytes(int(size))
 
-    def PackFixedByteSlices(p, byteSlices):
-        p.PackInt(len(byteSlices))
-        for bbytes in byteSlices:
+    def PackFixedByteSlices(p, byte_slices):
+        p.PackInt(len(byte_slices))
+        for bbytes in byte_slices:
             p.PackFixedBytes(bbytes)
 
     def UnpackFixedByteSlices(p, size: int):
@@ -222,9 +223,15 @@ class Packer:
         p.PackShort(ip.Port)
 
     def UnpackIP(p):
-        ip = p.UnpackFixedBytes(16)
+        ipbytes = p.UnpackFixedBytes(16)
+        ipa = None
+        if ipbytes[-6] == 0xff and ipbytes[-5] == 0xff:
+            ipa = ipaddress.IPv4Address(ipbytes[-4:])            
+        else:
+            ipa = ipaddress.IPv6Address(ipbytes)            
+
         port = p.UnpackShort()
-        return IPDesc(IP=ip, Port=port)
+        return IPDesc(IP=str(ipa), Port=port)
 
     def PackIPs(p, ips):
         p.PackInt(len(ips))
@@ -234,12 +241,13 @@ class Packer:
             i += 1
 
     def UnpackIPs(p):
-        sliceSize = p.UnpackInt()
+        sliceSize = p.UnpackInt()        
         ips = []
-        i = int(0)
-        if i < sliceSize and not p.Errored():
+        i = 0
+        while i < sliceSize and not p.Errored():
             ips.append(p.UnpackIP())
             i += 1
+
         return ips
 
     def TryPackByte(packer, valIntf):

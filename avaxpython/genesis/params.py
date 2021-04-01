@@ -30,7 +30,7 @@ __network_params = {
 # Params ...
 class Params:
 
-    def __init__(self):    
+    def __init__(self):
         # Transaction fee
         self.TxFee=0
         # Transaction fee for transactions that create new state

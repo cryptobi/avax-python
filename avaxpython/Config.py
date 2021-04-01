@@ -24,7 +24,6 @@ from pathlib import Path
 # General avaxpython configuration.
 # Specific to avax-python, not part of the AVAX implementation.
 
-
 # Default AVAX key size
 KEY_SIZE = 256
 MAX_WORKERS = 1
@@ -41,11 +40,11 @@ AVAX_NETWORK_VERSION = "avalanche/1.3.1"
 
 class Config:
 
-    def __init__(self):
+    def __init__(self, log_level=None):
         # ParallelDriver to use when not specified
         self.default_parallel_module = 'thread'
         self.default_config()
-        self.default_logger()
+        self.default_logger(log_level)
 
 
     def default_config(self):
@@ -83,11 +82,15 @@ class Config:
         return self._logger
 
 
-    def default_logger(self):
+    def default_logger(self, level=None):
+
+        if level is None:
+            level = self.get("logging_level")
+                        
         self._logger = logging.getLogger()
-        self._logger.setLevel(self.get("logging_level"))
+        self._logger.setLevel(level)
         handler = logging.StreamHandler(sys.stdout)
-        handler.setLevel(self.get("logging_level"))
+        handler.setLevel(level)
         formatter = logging.Formatter(self.get("logging_format"))
         handler.setFormatter(formatter)
         self._logger.addHandler(handler)

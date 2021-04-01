@@ -76,7 +76,10 @@ class Network:
         self.avax_config = avax_config
 
         if network_handler is None:
-            self.network_handler = AVAXHandler(self.avax_config)
+            if self.avax_config.get("network_handler"):
+                self.network_handler = self.avax_config.get("network_handler")
+            else:                
+                self.network_handler = AVAXHandler(self.avax_config)
         else:
             self.network_handler = network_handler
 
@@ -144,34 +147,37 @@ class Network:
 
         while True:
 
-            #if not self.network_handler.peer_state.get_got_peerlist(peer.id):
-            #    peer.GetPeerList()
-
-            r = conn.recv(Config.DEFAULT_BUFFIZ)
+            r = conn.recv(Packer.IntLen)
 
             if not r:
                 self.Log.error("Nothing received from {}. Aborting connection.".format(peer))
                 break
 
-            r_len = len(r)
-
-            if r_len == Packer.IntLen:
+            if len(r) == Packer.IntLen:
+                r_len = 0
                 pak_len = int.from_bytes(r, "big")
                 self.Log.debug("Attempting to read {} bytes".format(pak_len))
-                try:
-                    pak = conn.recv(pak_len)
-                    if len(pak) == pak_len:
-                        self.Log.debug("Received {} bytes.".format(pak_len))
-                        self.network_handler.handle_msg(pak, peer)
-                    else:
-                        self.Log.warning(
-                            "Expected message size {} and received size {} differ. Message ignored.".format(pak_len,
-                                                                                                            len(pak)))
+                
+                pak = bytearray()
+                while r_len < pak_len:
+                    try:
+                        pak_r = conn.recv(pak_len)
+                        r_len += len(pak_r)
+                        pak.extend(pak_r)
 
-                except Exception as e:
-                    import traceback
-                    traceback.print_exc()
-                    self.Log.error(f"Error receiving {pak_len} bytes from {peer} : {e}")
+                        if r_len == pak_len:
+                            self.Log.debug("Received {} bytes.".format(pak_len))
+                            self.network_handler.handle_msg(bytes(pak), peer)
+                        else:
+                            self.Log.warning(
+                                "Expected message size {} and received size {} differ. Message ignored.".format(pak_len,
+                                                                                                                len(pak)))
+
+                    except Exception as e:
+                        import traceback
+                        traceback.print_exc()
+                        self.Log.error(f"Error receiving {pak_len} bytes from {peer} : {e}")
+                        break
 
         self.Log.debug(f"Closing connection to {peer}")
         conn.close()
@@ -593,8 +599,7 @@ class Network:
 
     # assumes the stateLock is not held. Only returns if the ip is connected to or
     # the network is closed
-    def connect_to(self, peer: Peer):
-        print(f"connecting to {peer.ip.IP}")
+    def connect_to(self, peer: Peer):        
 
         while True:
 

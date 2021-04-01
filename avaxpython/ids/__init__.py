@@ -22,12 +22,17 @@ from avaxpython.ids.ID import ID
 from avaxpython.ids.ShortID import ShortID
 
 
-
 def Empty():
     return ID()
 
 
-def ToShortID(bts):
+def ToShortID(bts: bytes):
     n = hashlib.new('ripemd160')
     n.update(bts)    
     return ShortID(n.digest())
+
+
+def ToID(bts: bytes):
+    n = hashlib.new('sha256')
+    n.update(bts)
+    return ID(n.digest())

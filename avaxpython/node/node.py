@@ -42,12 +42,13 @@ from avaxpython.errors import errors
 from avaxpython.wallet import BIP32
 from avaxpython import ids
 from avaxpython.network.Builder import Builder
+from avaxpython.vms.manager import Manager as ChainManager
 
 
 TCP = "tcp"
 genesisHashKey = b"genesisID"
-Version                 = version.NewDefaultVersion(constants.PlatformName, 1, 1, 1)
-versionParser           = version.NewDefaultParser()
+Version = version.NewDefaultVersion(constants.PlatformName, 1, 1, 1)
+versionParser = version.NewDefaultParser()
 beaconConnectionTimeout = 1 * 60
 
 class insecureValidatorManager:
@@ -274,7 +275,7 @@ class Node:
     # Initializes the Platform chain.
     # Its genesis data specifies the other chains that should
     # be created.
-    def initChains(self, genesisBytes, avaxAssetID):
+    def initChains(self, genesisBytes: bytes):
         pass
 
 
@@ -287,7 +288,8 @@ class Node:
     # AVM, Simple Payments DAG, Simple Payments Chain, and Platform VM
     # Assumes self.DB, self.vdrs all initialized (non-nil)
     def initChainManager(self, avaxAssetID):
-        pass
+        self.vmManager = ChainManager()
+
 
 
     # initSharedMemory initializes the shared memory for cross chain interation
@@ -346,6 +348,7 @@ class Node:
         self.initNodeID()
         self.initBeacons()
         self.initNetworking()
+        self.initChainManager(self.Config.AvaxAssetID)
         
 
 

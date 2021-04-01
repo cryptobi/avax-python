@@ -22,6 +22,9 @@ from avaxpython import ids
 from enum import Enum
 from avaxpython.utils import nlimits
 
+AvaxAssetIDBytesHex = "21e67317cbc4be2aeb00677ad6462778a8f52274b9d605df2591b23027a87dff"
+assert len(AvaxAssetIDBytesHex) == 64
+
 MainnetID = 1
 CascadeID = 2
 DenaliID  = 3
@@ -115,6 +118,28 @@ MinConnectedStake = .80
 
 # Request ID used when sending a Put message to gossip an accepted container (ie not sent in response to a Get)
 GossipMsgRequestID = nlimits.limits(nlimits.c_uint32)[1]
+
+NullMsg = 0
+GetAcceptedFrontierMsg = 1
+AcceptedFrontierMsg = 2
+GetAcceptedFrontierFailedMsg = 3
+GetAcceptedMsg = 4
+AcceptedMsg = 5
+GetAcceptedFailedMsg = 6
+GetMsg = 7
+PutMsg = 8
+GetFailedMsg = 9
+PushQueryMsg = 10
+PullQueryMsg = 11
+ChitsMsg = 12
+QueryFailedMsg = 13
+ConnectedMsg = 14
+DisconnectedMsg = 15
+NotifyMsg = 16
+GossipMsg = 17
+GetAncestorsMsg = 18
+MultiPutMsg = 19
+GetAncestorsFailedMsg = 20
 
 
 # GetHRP returns the Human-Readable-Part of bech32 addresses for a networkID

@@ -30,8 +30,7 @@ class Dialer:
         self.avax_config = avax_config
         self.ssl_context = avaxpython_ssl.context_singleton(avax_config)
 
-    def Dial(self, ip: IPDesc):
-        print(f"dialing {ip}")
+    def Dial(self, ip: IPDesc):        
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)        
         conn = self.ssl_context.wrap_socket(s)
 

@@ -24,9 +24,9 @@ from avaxpython.network.Op import Op
 from .Handler import Handler
 from .PeerState import PeerState
 
-class AVAX(Handler):
+class HostLister(Handler):
 
-    """A network handler which attempts to implement the AVAX network protocol as described in https://docs.avax.network/build/references/network-protocol"""
+    """A network handler which lists all peers it can find on the AVAX network."""
 
     def __init__(self, avax_config: Config):
         self.avax_config = avax_config
@@ -88,7 +88,8 @@ class AVAX(Handler):
         """On receiving a Peers message, a node should compare the nodes appearing in the message
         to its own list of neighbors, and forge connections to any new nodes."""
         self.avax_config.logger().debug("Handling peerlist : Msg {} Peer {}".format(msg, peer))    
-
+        for p in msg.fields[5]:
+            print(p)
         self.peer_state.set_got_peerlist(peer.id)
 
     def ping(self, msg: Msg, peer: Peer):

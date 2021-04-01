@@ -31,6 +31,7 @@ class Messages:
 		Op.PeerList:    [Field.Peers],
 		Op.Ping:        [],
 		Op.Pong:        [],
+
 		# Bootstrapping:
 		Op.GetAcceptedFrontier: [Field.ChainID, Field.RequestID, Field.Deadline],
 		Op.AcceptedFrontier:    [Field.ChainID, Field.RequestID, Field.ContainerIDs],
@@ -38,6 +39,7 @@ class Messages:
 		Op.Accepted:            [Field.ChainID, Field.RequestID, Field.ContainerIDs],
 		Op.GetAncestors:        [Field.ChainID, Field.RequestID, Field.Deadline, Field.ContainerID],
 		Op.MultiPut:            [Field.ChainID, Field.RequestID, Field.MultiContainerBytes],
+
 		# Consensus:
 		Op.Get:       [Field.ChainID, Field.RequestID, Field.Deadline, Field.ContainerID],
 		Op.Put:       [Field.ChainID, Field.RequestID, Field.ContainerID, Field.ContainerBytes],

@@ -21,11 +21,20 @@ The above copyright notice and this permission notice shall be included in all c
 # type ID [32]byte in avalanchego/ids/id.go
 
 
-
-class ID:        
-
+class ID:
+    """256 bit ID"""
     __AVAX_ID_LENGTH = 32
 
-    def __init__(self):
-        
-        self.bytes = bytearray([0] * ID.__AVAX_ID_LENGTH)
+    def __init__(self, bts = None):
+
+        if bts is None:
+            self.bytes = bytearray([0] * ID.__AVAX_ID_LENGTH)
+        else:
+            if len(bts) != ID.__AVAX_ID_LENGTH:
+                raise Exception(f"Invalid ID byte length {len(bts)}. Expected {ID.__AVAX_ID_LENGTH} bytes.")
+
+            self.bytes = bts
+
+
+    def __repr__(self):
+        return self.bytes.hex()

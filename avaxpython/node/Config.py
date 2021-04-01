@@ -21,6 +21,8 @@ The above copyright notice and this permission notice shall be included in all c
 # Not to be confused with general Config at library root 
 
 from avaxpython.utils.ip import DynamicIPDesc
+from avaxpython.ids.ID import ID
+from avaxpython.utils import constants
 
 # Config contains all of the configurations of an Avalanche node.
 class Config:
@@ -164,5 +166,7 @@ class Config:
 
         # Coreth
         self.CorethConfig = "" # TODO string
+
+        self.AvaxAssetID = ID(bytearray.fromhex(constants.AvaxAssetIDBytesHex))
 
             

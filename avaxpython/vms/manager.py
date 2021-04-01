@@ -1,11 +1,6 @@
-#!/usr/bin/python3
-
 # avax-python : Python tools for the exploration of the Avalanche AVAX network.
 #
 # Documentation at https://crypto.bi
-
-# node.py - Standalone experimental AVAX network client.
-# Not a full/validating node, just a passive network participant.
 
 """
 
@@ -21,41 +16,23 @@ The above copyright notice and this permission notice shall be included in all c
 
 # --#--#--
 
-import signal
-import sys
-from avaxpython.Config import Config as AVAXConfig
-from avaxpython.network import ip
-from avaxpython.utils.ip import IPDesc
-from avaxpython.node.node import Node
-from avaxpython.node.Config import Config as NodeConfig
 
+class Manager:
 
-#
-# Getting ready to run node.py :
-#
-# Download and build the official AVAX implementation in Go
-# cd ~/go/src/github.com/ava-labs/
-# git clone https://github.com/ava-labs/avalanchego.git
-# cd avalanchego
-#
-# Run the Go client once to generate the needed certs and data directory.
-#
+    def __init__(self) -> None:
+        pass    
 
-node_config = NodeConfig()
-avax_config = AVAXConfig()
-logger = avax_config.logger()
+    def GetVMFactory(self, idx):
+        pass
 
-stk_ip = ip.get_internal_ip()
-node_config.StakingIP = IPDesc(stk_ip.ip, NodeConfig.STAKING_PORT)
+    def RegisterVMFactory(self, idx, vmf):
+        pass
 
-node = Node(avax_config=avax_config)
+    def Lookup(self, string):
+        pass
 
-def signal_handler(sig, frame):
-    logger.info("Stopping the AVAX node.")
-    node.Shutdown()
-    sys.exit(0)
+    def Aliases(idx):
+        pass
 
-signal.signal(signal.SIGINT, signal_handler)
-
-node.Initialize(node_config, avax_config)
-node.Dispatch()
+    def Alias(idx, alias):
+        pass

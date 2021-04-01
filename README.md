@@ -147,6 +147,21 @@ To customize the generator grammar, see the [Tatsu documentation](https://tatsu.
 
 Note that changing the grammar will require changes to `spec2py.py`. The generator uses hard coded offsets which will break if the grammar is modified.
 
+## List AVAX Network Nodes
+
+To list AVAX network peers received via P2P communications, run:
+
+    python3 bin/list_peers.py
+
+What this script does is install a custom network handler which prints out the content of PeerList messages.
+
+## Experimental AVAX Network Node
+
+To run an experimental, passive non-validating node that listens to events on the AVAX network, run :
+
+    python3 bin/node.py
+
+This is a work in progress.  
 
 ## Notes
 

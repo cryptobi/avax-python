@@ -1,11 +1,6 @@
-#!/usr/bin/python3
-
 # avax-python : Python tools for the exploration of the Avalanche AVAX network.
 #
 # Documentation at https://crypto.bi
-
-# node.py - Standalone experimental AVAX network client.
-# Not a full/validating node, just a passive network participant.
 
 """
 
@@ -21,41 +16,48 @@ The above copyright notice and this permission notice shall be included in all c
 
 # --#--#--
 
-import signal
-import sys
-from avaxpython.Config import Config as AVAXConfig
-from avaxpython.network import ip
-from avaxpython.utils.ip import IPDesc
-from avaxpython.node.node import Node
-from avaxpython.node.Config import Config as NodeConfig
+from avaxpython.vms.manager import Manager as AVMManager
 
 
-#
-# Getting ready to run node.py :
-#
-# Download and build the official AVAX implementation in Go
-# cd ~/go/src/github.com/ava-labs/
-# git clone https://github.com/ava-labs/avalanchego.git
-# cd avalanchego
-#
-# Run the Go client once to generate the needed certs and data directory.
-#
+class ManagerConfig:
 
-node_config = NodeConfig()
-avax_config = AVAXConfig()
-logger = avax_config.logger()
+    def __init__(self):
+        self.StakingEnabled=False
+        self.MaxPendingMsgs=0
+        self.MaxNonStakerPendingMsgs=0
+        self.StakerMSGPortion=0.0
+        self.StakerCPUPortion=0.0
+        self.Log=None
+        self.LogFactory=None
+        self.VMManager=AVMManager()
+        self.DecisionEvents=None
+        self.ConsensusEvents=None
+        self.DB=None
+        self.Router=None
+        self.Net=None
+        self.ConsensusParams=None
+        self.EpochFirstTransition=None
+        self.EpochDuration=None
+        self.Validators=None
+        self.NodeID=None
+        self.NetworkID=None
+        self.Server=None
+        self.Keystore=None
+        self.AtomicMemory=None
+        self.AVAXAssetID=None
+        self.XChainID=None
+        self.CriticalChains={}
+        self.WhitelistedSubnets={}
+        self.TimeoutManager=None
+        self.HealthService=None
+        self.RetryBootstrap=False
+        self.RetryBootstrapMaxAttempts=0
 
-stk_ip = ip.get_internal_ip()
-node_config.StakingIP = IPDesc(stk_ip.ip, NodeConfig.STAKING_PORT)
 
-node = Node(avax_config=avax_config)
+class Manager:
 
-def signal_handler(sig, frame):
-    logger.info("Stopping the AVAX node.")
-    node.Shutdown()
-    sys.exit(0)
+    def __init__(self):
+        self.chains = {}
+        self.subnets = {}
+        self.config = ManagerConfig()
 
-signal.signal(signal.SIGINT, signal_handler)
-
-node.Initialize(node_config, avax_config)
-node.Dispatch()

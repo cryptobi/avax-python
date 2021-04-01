@@ -1,11 +1,6 @@
-#!/usr/bin/python3
-
 # avax-python : Python tools for the exploration of the Avalanche AVAX network.
 #
 # Documentation at https://crypto.bi
-
-# node.py - Standalone experimental AVAX network client.
-# Not a full/validating node, just a passive network participant.
 
 """
 
@@ -21,41 +16,20 @@ The above copyright notice and this permission notice shall be included in all c
 
 # --#--#--
 
-import signal
-import sys
-from avaxpython.Config import Config as AVAXConfig
-from avaxpython.network import ip
-from avaxpython.utils.ip import IPDesc
-from avaxpython.node.node import Node
-from avaxpython.node.Config import Config as NodeConfig
+from .handler import Handler
+from avaxpython.utils import constants
 
 
-#
-# Getting ready to run node.py :
-#
-# Download and build the official AVAX implementation in Go
-# cd ~/go/src/github.com/ava-labs/
-# git clone https://github.com/ava-labs/avalanchego.git
-# cd avalanchego
-#
-# Run the Go client once to generate the needed certs and data directory.
-#
+class ChainRouter:
 
-node_config = NodeConfig()
-avax_config = AVAXConfig()
-logger = avax_config.logger()
+    def __init__(self):
+        self.chains = {} # map[ids.ID]*Handler
 
-stk_ip = ip.get_internal_ip()
-node_config.StakingIP = IPDesc(stk_ip.ip, NodeConfig.STAKING_PORT)
+    def Put(self, validatorID, chainID, requestID, containerID, container):
 
-node = Node(avax_config=avax_config)
+        if chainID not in self.chains:
+            raise Exception(f"ChainID {chainID} not handled by this Router.")
 
-def signal_handler(sig, frame):
-    logger.info("Stopping the AVAX node.")
-    node.Shutdown()
-    sys.exit(0)
+        chain = self.chains[chainID]
+        chain.Put(validatorID, requestID, containerID, container)
 
-signal.signal(signal.SIGINT, signal_handler)
-
-node.Initialize(node_config, avax_config)
-node.Dispatch()

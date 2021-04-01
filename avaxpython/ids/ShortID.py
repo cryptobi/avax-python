@@ -23,12 +23,18 @@ class ShortID:
     """160 bit ID"""
     __AVAX_SHORTID_LENGTH = 20
 
-    def __init__(self, bts = None):
+    def __init__(self, bts: bytes = None):
         if bts is None:
             self.bytes = bytearray([0] * ShortID.__AVAX_SHORTID_LENGTH)
         else:
+
+            if len(bts) != ShortID.__AVAX_SHORTID_LENGTH:
+                raise Exception(f"Invalid ShortID byte length {len(bts)}. Expected {ShortID.__AVAX_SHORTID_LENGTH} bytes.")
+
             self.bytes = bts
 
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.bytes.hex()
+
+

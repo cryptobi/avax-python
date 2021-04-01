@@ -4,7 +4,7 @@
 #
 # Documentation at https://crypto.bi
 
-# list_peers.py - Recursively fetch AVAX peers until cancelled.
+# list_peers.py - List peers found on the AVAX network
 
 """
 
@@ -21,100 +21,35 @@ The above copyright notice and this permission notice shall be included in all c
 # --#--#--
 
 
-import socket
-import ssl
-import avaxpython
-from avaxpython import Config
+import signal
+import sys
+import logging
 from avaxpython.Config import Config as AVAXConfig
-from avaxpython.genesis import beacons
-from avaxpython.utils import constants
-from avaxpython.utils.wrappers.Packer import Packer
-from avaxpython.network.network import Network
+from avaxpython.network import ip
+from avaxpython.utils.ip import IPDesc
 from avaxpython.node.node import Node
-from avaxpython.network.Messages import Messages
-from avaxpython.network.Field import Field
-from avaxpython.network.Op import Op
-from avaxpython.network.Msg import Msg
-from avaxpython.network.codec import Codec
-
-# Download and build the official AVAX implementation in Go
-# cd ~/go/src/github.com/ava-labs/
-# git clone https://github.com/ava-labs/avalanchego.git
-# cd avalanchego
-# 
-# Run the Go client once to generate the needed certs
-#
-
-# Lib ------------------------------------------------------------------------
+from avaxpython.node.Config import Config as NodeConfig
+from avaxpython.network.handlers.HostLister import HostLister
 
 
-def avax_handle_msg(msg):
-    logger.debug("avax_handle_msg called with {} bytes".format(len(msg)))
-    parsed_msg = Codec.Parse(msg)
-    print(parsed_msg)
-
-
-def avax_handle_protocol(conn):
-    """Handle the AVAX protocol using SSL socket conn."""
-
-    while True:
-
-        r = conn.recv(Config.DEFAULT_BUFFIZ)
-
-        if not r:
-            logger.error("Nothing received from {}:{} . Aborting connection.".format(host_addr, host_port))
-            break
-
-        r_len = len(r)
-
-        if r_len == Packer.IntLen:
-            pak_len = int.from_bytes(r, "big")
-            logger.debug("Attempting to read {} bytes".format(pak_len))            
-            pak = conn.recv(pak_len)
-            if len(pak) == pak_len:
-                logger.debug("Received {} bytes.".format(pak_len))
-                avax_handle_msg(pak)
-            else:
-                logger.warning("Message size {} and received size {} differ. Message ignored.".format(pak_len, len(pak)))
-
-
-    logger.debug("Closing connection")
-    conn.close()
-
-
-def avax_dispatch_host(beacon_hp, beacon_id):
-    logger.debug("Connecting to {} ID {}".format(beacon_hp, beacon_id))
-    host_addr, host_port = beacon_hp.split(":")
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    conn = context.wrap_socket(s)
-    conn.connect( (host_addr, int(host_port)) )
-    avax_handle_protocol(conn)
-
-
-# Run ------------------------------------------------------------------------
-
-# Load config and logger
-
-avax_config = AVAXConfig()
+node_config = NodeConfig()
+avax_config = AVAXConfig(log_level=logging.ERROR)
 logger = avax_config.logger()
 
-node = Node()
-node.Net = Network()
+hl = HostLister(avax_config)
+avax_config.set("network_handler", hl)
 
-context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
-context.check_hostname = False
-context.verify_mode = ssl.CERT_NONE
-context.load_cert_chain(certfile=avax_config.get("staker_crt"), keyfile=avax_config.get("staker_key"))
+stk_ip = ip.get_internal_ip()
+node_config.StakingIP = IPDesc(stk_ip.ip, NodeConfig.STAKING_PORT)
 
-p = avaxpython.parallel()
+node = Node(avax_config=avax_config)
 
-for i in range(len(beacons.beacon_ips[constants.MainnetID])):
+def signal_handler(sig, frame):
+    logger.info("Stopping the AVAX node.")
+    node.Shutdown()
+    sys.exit(0)
 
-    beacon_hp = beacons.beacon_ips[constants.MainnetID][i]
-    beacon_id = beacons.beacon_ids[constants.MainnetID][i]
+signal.signal(signal.SIGINT, signal_handler)
 
-    avax_dispatch_host(beacon_hp, beacon_id)
-    #f = p.go(avax_dispatch_host, beacon_hp, beacon_id)
-
-    #print(f.result())
-
+node.Initialize(node_config, avax_config)
+node.Dispatch()
