@@ -159,7 +159,7 @@ What this script does is install a custom network handler which prints out the c
 
 To run an experimental, passive non-validating node that listens to events on the AVAX network, run :
 
-    python3 bin/node.py
+    python3 bin/avax.py
 
 This is a work in progress.  
 
