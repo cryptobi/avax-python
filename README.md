@@ -8,6 +8,7 @@ Includes an implementation of basic AVAX API calls, offline wallet generator and
 ## Documentation and Tutorials
 
 * [avax-python – Python utils for AVAX cryptocurrency and Avalanche network exploration](https://crypto.bi/avax-python/)
+* [avax-python Avalanche AVAX Network Listener](https://crypto.bi/avalanche-network-listener/) - Capture blocks, vertices and transactions from the Avalanche network and into JSON or other custom format
 * [avax-python Implementation Notes](https://crypto.bi/avax-python-notes/)
 * [avax-python Network Message Pipeline](https://crypto.bi/avax-python-messages/)
 * [Scrape AVAX network peers using avax-python](https://crypto.bi/list-avax-peers/)
