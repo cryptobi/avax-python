@@ -1,17 +1,22 @@
-
 # avax-python : Python tools for the exploration of the Avalanche AVAX network.
 #
-# Documentation at https://crypto.bi
+# Find tutorials and use cases at https://crypto.bi
 
 """
 
-Copyright © 2021 ojrdev
+Copyright (C) 2021 - crypto.bi
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-# THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,  DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,  DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+---
+
+Help support this Open Source project!
+Donations address: X-avax1qr6yzjykcjmeflztsgv6y88dl0xnlel3chs3r4
+Thank you!
 
 """
 
@@ -21,7 +26,7 @@ The above copyright notice and this permission notice shall be included in all c
 import ipaddress
 from avaxpython.errors import errors
 
-errBadIP = errors.New("bad ip format")
+errBadIP = Exception("bad ip format")
 # This was taken from: https://stackoverflow.com/a/50825191/3478466
 privateIPBlocks = []
 
@@ -42,12 +47,8 @@ def init():
 		block = IPNetwork(cidr)
 		privateIPBlocks.append(block)
 
-
-# TODO
 def ToIPDesc(ip_string):
-	host, portStr, err = net.SplitHostPort(str)
-	if err != None:
-		return IPDesc(), errBadIP
+	host, portStr = net.SplitHostPort(str)
 	
 	port = int(portStr)	
 	ip = net.ParseIP(host)
@@ -63,7 +64,7 @@ class IPDesc:
 	V4 = 4
 	V6 = 16
 
-	def __init__(self, IP: str, Port: int, Version = V4):
+	def __init__(self, IP: str = "", Port: int = 0, Version = V4):
 		self.IP = IP
 		self.Port = Port
 		self.version = Version
@@ -81,27 +82,28 @@ class IPDesc:
 			raise Exception(f"Unknown IP format {self.IP} binary {pkt}")
 
 
+	def __str__(self):
+		return f"{self.IP}:{self.Port}"
+
 
 	def __repr__(self):
 		return f"{self.IP}:{self.Port}"
 
-	# Equal ...
-	def Equal(otherIPDesc):
-		return ipDesc.Port == otherIPDesc.Port and	ipDesc.IP.Equal(otherIPDesc.IP)	
+	def Equal(self, other):
+		return self.Port == other.Port and	self.IP.Equal(other.IP)	
 
-	# PortString ...
-	def PortString():
+	def PortString(self):
 		return ":{}".format(self.Port)
 	
 
-	def String():
-		return net.JoinHostPort(ipDesc.IP.String(), fmt.Sprintf("%d", ipDesc.Port))	
+	def String(self):
+		return net.JoinHostPort(self.IP.String(), fmt.Sprintf("%d", self.Port))	
 
-	# IsPrivate attempts to decide if the ip address in this descriptor is a local
-	# ip address.
-	# This function was taken from: https://stackoverflow.com/a/50825191/3478466
-	def IsPrivate():
-		ip = ipDesc.IP
+	def IsPrivate(self):
+		"""	IsPrivate attempts to decide if the ip address in this descriptor is a local ip address.
+		This function was taken from: https://stackoverflow.com/a/50825191/3478466
+		"""
+		ip = self.IP
 		if ip.IsLoopback() or ip.IsLinkLocalUnicast() or ip.IsLinkLocalMulticast():
 			return True
 
@@ -120,6 +122,7 @@ class IPDesc:
 class IPDescContainer(IPDesc):
 
 	def __init__(self, ipdesc):	
+		super().__init__()
 		self.IPDesc = ipdesc		
 
 
@@ -129,6 +132,10 @@ class DynamicIPDesc(IPDescContainer):
 		ipd = IPDesc(ip, port)
 		self.IPDescContainer = IPDescContainer(ipd)
 		self.IPDesc = ipd
+
+	def __str__(self):
+		return str(self.IPDesc)
+
 
 	def __repr__(self):
 		return str(self.IPDesc)

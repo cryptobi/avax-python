@@ -1,22 +1,29 @@
 # avax-python : Python tools for the exploration of the Avalanche AVAX network.
 #
-# Documentation at https://crypto.bi
+# Find tutorials and use cases at https://crypto.bi
 
 """
 
-Copyright © 2021 ojrdev
+Copyright (C) 2021 - crypto.bi
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-# THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,  DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,  DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+---
+
+Help support this Open Source project!
+Donations address: X-avax1qr6yzjykcjmeflztsgv6y88dl0xnlel3chs3r4
+Thank you!
 
 """
 
 # --#--#--
 
 import time
+import avaxpython
 from avaxpython.utils.ip import IPDesc
 from avaxpython.network.Msg import Msg
 from avaxpython.utils import constants
@@ -36,11 +43,10 @@ class Alias:
 class Peer:
     """Class encapsulating the functionality of an AVAX network Peer"""
 
-    def __init__(self, net, conn, ip: IPDesc, tickerCloser=None, port=0, id=None, node=None, avax_config=None):
+    def __init__(self, net, conn, ip: IPDesc, tickerCloser=None, port=0, id=None, node=None, my_staking_ip = None):
         # network this peer is part of
         self.net = net
         self.expiry = None
-        self.avax_config = avax_config
         self.node = node
         # if the version message has been received and is valid. is only modified
         # on the connection's reader routine.
@@ -50,6 +56,8 @@ class Peer:
 
         # only close the peer once
         self.once = None  # sync.Once
+
+        self.my_staking_ip = my_staking_ip
 
         # if the close function has been called.
         self.closed = False  # utils.AtomicBool
@@ -101,8 +109,8 @@ class Peer:
         # ticker processes
         self.tickerOnce = None  # sync.Once
 
-        if avax_config is not None:
-            self.Log = avax_config.logger()
+
+        self.Log = avaxpython.config().logger()
 
     def __repr__(self):
         return f"IP {self.ip} ID {self.id}"
@@ -210,8 +218,7 @@ class Peer:
     def Version(p):
         ts = int(time.time())
 
-        msg = p.net.b.Version(constants.MainnetID, p.net.nodeID, ts, p.node.Config.StakingIP,
-                              Config.AVAX_NETWORK_VERSION)
+        msg = p.net.b.Version(constants.MainnetID, p.net.nodeID, ts, p.my_staking_ip, Config.AVAX_NETWORK_VERSION)
 
         p.Send(msg)
 
@@ -300,7 +307,6 @@ class Peer:
     def chits(p, msg):
         pass
 
-    # assumes the [stateLock] is held
     def tryMarkConnected(p):
         p.connected = True
 
@@ -319,21 +325,15 @@ class Peer:
     def addAlias(p, ip):
         pass
 
-    # releaseNextAlias returns the next released alias or nil if none was released.
-    # If none was released, then this will schedule the next time to remove an
-    # alias.
-    # assumes [stateLock] is held
     def releaseNextAlias(p, now_time):
-        pass
+        """releaseNextAlias returns the next released alias or None if none was released.
+        If none was released, then this will schedule the next time to remove an alias."""
 
-    # releaseExpiredAliases frees expired IP aliases. If there is an IP pending
-    # expiration, then the expiration is scheduled.
-    # assumes [stateLock] is not held
     def releaseExpiredAliases(p):
-        pass
+        """releaseExpiredAliases frees expired IP aliases. If there is an IP pending
+        expiration, then the expiration is scheduled."""
 
-    # releaseAllAliases frees all alias IPs.
-    # assumes [stateLock] is held and that [aliasTimer]
-    # has been stopped
     def releaseAllAliases(p):
+        """releaseAllAliases frees all alias IPs.
+        assumes [stateLock] is held and that [aliasTimer] has been stopped"""
         pass

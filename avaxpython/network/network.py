@@ -1,16 +1,22 @@
 # avax-python : Python tools for the exploration of the Avalanche AVAX network.
 #
-# Documentation at https://crypto.bi
+# Find tutorials and use cases at https://crypto.bi
 
 """
 
-Copyright © 2021 ojrdev
+Copyright (C) 2021 - crypto.bi
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-# THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,  DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,  DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+---
+
+Help support this Open Source project!
+Donations address: X-avax1qr6yzjykcjmeflztsgv6y88dl0xnlel3chs3r4
+Thank you!
 
 """
 
@@ -19,15 +25,17 @@ The above copyright notice and this permission notice shall be included in all c
 import time
 import socket
 import hashlib
-from .Builder import Builder
-from .metrics import metrics as mt
+import random
+import avaxpython
+from avaxpython.network.Builder import Builder
+from avaxpython.network.metrics import metrics as mt
 import avaxpython.utils.logging
-from ..ids import ShortID
+from avaxpython.ids.ShortID import ShortID
+from avaxpython.types import *
 from avaxpython.utils.timer import Executor
 from avaxpython.utils import constants, ip
 from avaxpython.utils import logging
 from avaxpython.utils.ip import IPDesc
-from avaxpython.ids.ShortID import ShortID
 from avaxpython.ids.ID import ID
 from avaxpython.version import version
 from avaxpython.network.Messages import Messages
@@ -37,8 +45,8 @@ from avaxpython.network.dialer import Dialer
 from avaxpython.network.Op import Op
 from avaxpython.utils.wrappers.Packer import Packer
 from avaxpython import Config
-import avaxpython
 from avaxpython.network.handlers.AVAX import AVAX as AVAXHandler
+from avaxpython.snow.networking.router.chain_router import ChainRouter
 
 # All periods in seconds
 defaultInitialReconnectDelay = 1
@@ -71,15 +79,13 @@ class Network:
                  pingFrequency=None, disconnectedIPs={}, connectedIPs={}, retryDelay=30, myIPs={}, peers={},
                  readBufferSize=None, readHandshakeTimeout=None, connMeter=None, connMeterMaxConns=None,
                  restartOnDisconnected=None, connectedCheckerCloser=None, disconnectedCheckFreq=None,
-                 connectedMeter=None, restarter=None, apricotPhase0Time=None, avax_config=None, network_handler=None):
-
-        self.avax_config = avax_config
+                 connectedMeter=None, restarter=None, apricotPhase0Time=None, network_handler=None):
 
         if network_handler is None:
-            if self.avax_config.get("network_handler"):
-                self.network_handler = self.avax_config.get("network_handler")
+            if avaxpython.config().get("handler").network_handler:
+                self.network_handler = avaxpython.config().get("handler").network_handler
             else:                
-                self.network_handler = AVAXHandler(self.avax_config)
+                self.network_handler = AVAXHandler()
         else:
             self.network_handler = network_handler
 
@@ -96,7 +102,7 @@ class Network:
         self.clientUpgrader = clientUpgrader
         self.vdrs = vdrs
         self.beacons = beacons
-        self.router = router
+        self.router: ChainRouter = router
         self.nodeID = nodeID
         self.clock = None  # TODO
         self.lastHeartbeat = 0
@@ -138,7 +144,7 @@ class Network:
         self.restarter = restarter
         self.hasMasked = True
         self.maskedValidators = {}
-        self.Log = avax_config.logger()
+        self.Log = avaxpython.config().logger()
         self.num_peers = 0
 
     def handle_protocol(self, peer):
@@ -168,10 +174,7 @@ class Network:
                         if r_len == pak_len:
                             self.Log.debug("Received {} bytes.".format(pak_len))
                             self.network_handler.handle_msg(bytes(pak), peer)
-                        else:
-                            self.Log.warning(
-                                "Expected message size {} and received size {} differ. Message ignored.".format(pak_len,
-                                                                                                                len(pak)))
+                            break
 
                     except Exception as e:
                         import traceback
@@ -184,7 +187,7 @@ class Network:
 
     def add_peer(self, peer: Peer):
         """Add a peer to our network state."""
-        if self.peers == None:
+        if self.peers is None:
             self.peers = []
 
         self.peers.append(peer)
@@ -202,12 +205,12 @@ class Network:
 
     def GetAcceptedFrontier(self, validatorIDs, chainID, requestID, deadline):
 
-        msg = self.b.GetAcceptedFrontier(chainID, requestID, uint64(deadline.Sub(n.clock.Time())))
+        msg = self.b.GetAcceptedFrontier(chainID, requestID, Uint64(deadline.Sub(self.clock.Time())))
 
         for peerElement in self.getPeers(validatorIDs):
             peer = peerElement.peer
             vID = peerElement.id
-            if peer == None or not peer.connected.GetValue() or not peer.Send(msg):
+            if peer is None or not peer.connected.GetValue() or not peer.Send(msg):
                 self.Log.debug("failed to send GetAcceptedFrontier(%s, %s, %d)", vID, chainID, requestID)
 
                 self.executor.Add(lambda: self.router.GetAcceptedFrontierFailed(vID, chainID, requestID))
@@ -217,12 +220,12 @@ class Network:
 
     def AcceptedFrontier(self, validatorID, chainID, requestID, containerIDs):
         msg = self.b.AcceptedFrontier(chainID, requestID, containerIDs)
-        if err is not None:
+        if msg is None:
             self.Log.error("failed to build AcceptedFrontier(%s, %d, %s): %s", chainID, requestID, containerIDs, err)
             return  # Packing message failed
 
         peer = self.getPeer(validatorID)
-        if peer == None or not peer.connected.GetValue() or not peer.Send(msg):
+        if peer is None or not peer.connected.GetValue() or not peer.Send(msg):
             self.Log.debug("failed to send AcceptedFrontier(%s, %s, %d, %s)", validatorID, chainID, requestID,
                            containerIDs)
             self.acceptedFrontier.numFailed.Inc()
@@ -230,7 +233,7 @@ class Network:
             self.acceptedFrontier.numSent.Inc()
 
     def GetAccepted(self, validatorIDs, chainID, requestID, deadline, containerIDs):
-        msg = self.b.GetAccepted(chainID, requestID, uint64(deadline.Sub(n.clock.Time())), containerIDs)
+        msg = self.b.GetAccepted(chainID, requestID, Uint64(deadline.Sub(self.clock.Time())), containerIDs)
         if err is not None:
             self.Log.error("failed to build GetAccepted(%s, %d, %s): %s", chainID, requestID, containerIDs, err)
             for validatorID in validatorIDs:
@@ -242,7 +245,7 @@ class Network:
         for peerElement in self.getPeers(validatorIDs):
             peer = peerElement.peer
             vID = peerElement.id
-            if peer == None or not peer.connected.GetValue() or not peer.Send(msg):
+            if peer is None or not peer.connected.GetValue() or not peer.Send(msg):
                 self.Log.debug("failed to send GetAccepted(%s, %s, %d, %s)", vID, chainID, requestID, containerIDs)
                 self.executor.Add(lambda: self.router.GetAcceptedFailed(vID, chainID, requestID))
                 self.getAccepted.numFailed.Inc()
@@ -251,7 +254,7 @@ class Network:
 
     def gossip(self):
 
-        t = time.NewTicker(n.peerListGossipSpacing)
+        t = time.NewTicker(self.peerListGossipSpacing)
         # # defer t.Stop()
 
         for _ in t.C:
@@ -267,8 +270,8 @@ class Network:
                 ip = peer.getIP()
                 if peer.connected.GetValue() and not ip.IsZero() and self.vdrs.Contains(peer.id):
                     peerVersion = (peer.versionStruct.GetValue())(version.Version)
-                    if not peerVersion.Before(minimumUnmaskedVersion) or time.Since(n.apricotPhase0Time) < 0:
-                        ips = append(ips, ip)
+                    if not peerVersion.Before(minimumUnmaskedVersion) or time.Since(self.apricotPhase0Time) < 0:
+                        ips.append(ip)
 
             if len(ips) == 0:
                 self.Log.debug("skipping validator gossiping as no public validators are connected")
@@ -283,12 +286,11 @@ class Network:
             nonStakers = []
             for peer in allPeers:
                 if self.vdrs.Contains(peer.id):
-                    stakers = append(stakers, peer)
+                    stakers.append(peer)
                 else:
-                    nonStakers = append(nonStakers, peer)
+                    nonStakers.append(peer)
 
-            numStakersToSend = (
-                                           n.peerListGossipSize + self.peerListStakerGossipFraction - 1) / self.peerListStakerGossipFraction
+            numStakersToSend = (self.peerListGossipSize + self.peerListStakerGossipFraction - 1) / self.peerListStakerGossipFraction
             if len(stakers) < numStakersToSend:
                 numStakersToSend = len(stakers)
 
@@ -296,36 +298,13 @@ class Network:
             if len(nonStakers) < numNonStakersToSend:
                 numNonStakersToSend = len(nonStakers)
 
-            s = sampler.NewUniform()
-            err = s.Initialize(uint64(len(stakers)))
-            if err is not None:
-                self.Log.error("failed to select stakers to sample: %s. len(stakers): %d", err, len(stakers))
-                continue
+            for staker in random.sample(stakers, numStakersToSend):
+                staker.Send(msg)
 
-            stakerIndices, err = s.Sample(numStakersToSend)
-            if err is not None:
-                self.Log.error("failed to select stakers to sample: %s. len(stakers): %d", err, len(stakers))
-                continue
-
-            for index in stakerIndices:
-                stakers[int(index)].Send(msg)
-
-            err = s.Initialize(uint64(len(nonStakers)))
-            if err is not None:
-                self.Log.error("failed to select non-stakers to sample: %s. len(nonStakers): %d", err, len(nonStakers))
-                continue
-
-            nonStakerIndices, err = s.Sample(numNonStakersToSend)
-            if err is not None:
-                self.Log.error("failed to select non-stakers to sample: %s. len(nonStakers): %d", err, len(nonStakers))
-                continue
-
-            for index in nonStakerIndices:
-                nonStakers[int(index)].Send(msg)
+            for nonstaker in random.sample(nonStakers, numNonStakersToSend):
+                nonstaker.Send(msg)
 
     def Dispatch(self):
-
-        # go self.gossip()
 
         # Continuously accept new connections
         while True:
@@ -352,30 +331,28 @@ class Network:
             return  # Packing message failed
 
         peer = self.getPeer(validatorID)
-        if peer == None or not peer.connected.GetValue() or not peer.Send(msg):
+        if peer is None or not peer.connected.GetValue() or not peer.Send(msg):
             self.Log.debug("failed to send Accepted(%s, %s, %d, %s)", validatorID, chainID, requestID, containerIDs)
             self.accepted.numFailed.Inc()
         else:
             self.accepted.numSent.Inc()
 
-    # GetAncestors implements the Sender interface.
-    # assumes the stateLock is not held.
+    # GetAncestors implements the Sender interface.    
     def GetAncestors(self, validatorID, chainID, requestID, deadline, containerID):
-        msg = self.b.GetAncestors(chainID, requestID, uint64(deadline.Sub(n.clock.Time())), containerID)
+        msg = self.b.GetAncestors(chainID, requestID, Uint64(deadline.Sub(self.clock.Time())), containerID)
         if err is not None:
             self.Log.error("failed to build GetAncestors message: %s", err)
             return
 
         peer = self.getPeer(validatorID)
-        if peer == None or not peer.connected.GetValue() or not peer.Send(msg):
+        if peer is None or not peer.connected.GetValue() or not peer.Send(msg):
             self.Log.debug("failed to send GetAncestors(%s, %s, %d, %s)", validatorID, chainID, requestID, containerID)
             self.executor.Add(lambda: self.router.GetAncestorsFailed(validatorID, chainID, requestID))
             self.getAncestors.numFailed.Inc()
         else:
             self.getAncestors.numSent.Inc()
 
-    # MultiPut implements the Sender interface.
-    # assumes the stateLock is not held.
+    # MultiPut implements the Sender interface.    
     def MultiPut(self, validatorID, chainID, requestID, containers):
         msg = self.b.MultiPut(chainID, requestID, containers)
         if err is not None:
@@ -383,28 +360,26 @@ class Network:
             return
 
         peer = self.getPeer(validatorID)
-        if peer == None or not peer.connected.GetValue() or not peer.Send(msg):
+        if peer is None or not peer.connected.GetValue() or not peer.Send(msg):
             self.Log.debug("failed to send MultiPut(%s, %s, %d, %d)", validatorID, chainID, requestID, len(containers))
             self.multiPut.numFailed.Inc()
         else:
             self.multiPut.numSent.Inc()
 
-    # Get implements the Sender interface.
-    # assumes the stateLock is not held.
+    # Get implements the Sender interface.    
     def Get(self, validatorID, chainID, requestID, deadline, containerID):
-        msg = self.b.Get(chainID, requestID, uint64(deadline.Sub(n.clock.Time())), containerID)
+        msg = self.b.Get(chainID, requestID, Uint64(deadline.Sub(self.clock.Time())), containerID)
         self.Log.AssertNoError(err)
 
         peer = self.getPeer(validatorID)
-        if peer == None or not peer.connected.GetValue() or not peer.Send(msg):
+        if peer is None or not peer.connected.GetValue() or not peer.Send(msg):
             self.Log.debug("failed to send Get(%s, %s, %d, %s)", validatorID, chainID, requestID, containerID)
             self.executor.Add(lambda: self.router.GetFailed(validatorID, chainID, requestID))
             self.get.numFailed.Inc()
         else:
             self.get.numSent.Inc()
 
-    # Put implements the Sender interface.
-    # assumes the stateLock is not held.
+    # Put implements the Sender interface.    
     def Put(self, validatorID, chainID, requestID, containerID, container):
         msg = self.b.Put(chainID, requestID, containerID, container)
         if err is not None:
@@ -413,17 +388,16 @@ class Network:
             return
 
         peer = self.getPeer(validatorID)
-        if peer == None or not peer.connected.GetValue() or not peer.Send(msg):
+        if peer is None or not peer.connected.GetValue() or not peer.Send(msg):
             self.Log.debug("failed to send Put(%s, %s, %d, %s)", validatorID, chainID, requestID, containerID)
             self.Log.debug("container: %s", formatting.DumpBytes(Bytes=container))
             self.put.numFailed.Inc()
         else:
             self.put.numSent.Inc()
 
-    # PushQuery implements the Sender interface.
-    # assumes the stateLock is not held.
+    # PushQuery implements the Sender interface.    
     def PushQuery(self, validatorIDs, chainID, requestID, deadline, containerID, container):
-        msg = self.b.PushQuery(chainID, requestID, uint64(deadline.Sub(n.clock.Time())), containerID, container)
+        msg = self.b.PushQuery(chainID, requestID, Uint64(deadline.Sub(self.clock.Time())), containerID, container)
 
         if err is not None:
             self.Log.error("failed to build PushQuery(%s, %d, %s): %s. len(container): %d", chainID, requestID,
@@ -438,7 +412,7 @@ class Network:
         for peerElement in self.getPeers(validatorIDs):
             peer = peerElement.peer
             vID = peerElement.id
-            if peer == None or not peer.connected.GetValue() or not peer.Send(msg):
+            if peer is None or not peer.connected.GetValue() or not peer.Send(msg):
                 self.Log.debug("failed to send PushQuery(%s, %s, %d, %s)", vID, chainID, requestID, containerID)
                 self.Log.debug("container: %s", formatting.DumpBytes(Bytes=container))
                 self.executor.Add(lambda: self.router.QueryFailed(vID, chainID, requestID))
@@ -446,23 +420,21 @@ class Network:
             else:
                 self.pushQuery.numSent.Inc()
 
-    # PullQuery implements the Sender interface.
-    # assumes the stateLock is not held.
+    # PullQuery implements the Sender interface.    
     def PullQuery(self, validatorIDs, chainID, requestID, deadline, containerID):
-        msg = self.b.PullQuery(chainID, requestID, uint64(deadline.Sub(n.clock.Time())), containerID)
+        msg = self.b.PullQuery(chainID, requestID, Uint64(deadline.Sub(self.clock.Time())), containerID)
         self.Log.AssertNoError(err)
 
         for peerElement in self.getPeers(validatorIDs):
             peer = peerElement.peer
             vID = peerElement.id
-            if peer == None or not peer.connected.GetValue() or not peer.Send(msg):
+            if peer is None or not peer.connected.GetValue() or not peer.Send(msg):
                 self.Log.debug("failed to send PullQuery(%s, %s, %d, %s)", vID, chainID, requestID, containerID)
                 self.executor.Add(lambda: self.router.QueryFailed(vID, chainID, requestID))
             else:
                 self.pullQuery.numSent.Inc()
 
-    # Chits implements the Sender interface.
-    # assumes the stateLock is not held.
+    # Chits implements the Sender interface.    
     def Chits(self, validatorID, chainID, requestID, votes):
         msg = self.b.Chits(chainID, requestID, votes)
         if err is not None:
@@ -470,23 +442,19 @@ class Network:
             return
 
         peer = self.getPeer(validatorID)
-        if peer == None or not peer.connected.GetValue() or not peer.Send(msg):
+        if peer is None or not peer.connected.GetValue() or not peer.Send(msg):
             self.Log.debug("failed to send Chits(%s, %s, %d, %s)", validatorID, chainID, requestID, votes)
             self.chits.numFailed.Inc()
         else:
             self.chits.numSent.Inc()
 
-    # Gossip attempts to gossip the container to the network
-    # assumes the stateLock is not held.
+    # Gossip attempts to gossip the container to the network    
     def Gossip(self, chainID, containerID, container):
         err = self.gossipContainer(chainID, containerID, container)
         if err is not None:
             self.Log.debug("failed to Gossip(%s, %s): %s", chainID, containerID, err)
             self.Log.debug("container:\n%s", formatting.DumpBytes(Bytes=container))
-
-            # Accept is called after every consensus decision
-
-    # assumes the stateLock is not held.
+    
     def Accept(self, ctx, containerID, container):
         if not ctx.IsBootstrapped():
             # don't gossip during bootstrapping
@@ -501,11 +469,10 @@ class Network:
 
     # GetHeartbeat returns the most recent heartbeat time
     def GetHeartbeat(self):
-        return atomic.LoadInt64(n.lastHeartbeat)
+        return atomic.LoadInt64(self.lastHeartbeat)
 
         # IPs implements the Network interface
-
-    # assumes the stateLock is not held.
+    
     def Peers(self):
         self.stateLock.RLock()
         # # defer self.stateLock.RUnlock() # TODO
@@ -513,7 +480,7 @@ class Network:
         peers = []
         for peer in self.peers:
             if peer.connected.GetValue():
-                # TODO tem erro nesta linha
+                # TODO fix
                 # IP=peer.conn.RemoteAddr().String(),PublicIP=peer.getIP().String(),ID=peer.id.PrefixedString(constants.NodeIDPrefix),Version=(peer.versionStr.GetValue())(string),LastSent=time.Unix(atomic.LoadInt64(peer.lastSent), 0),LastReceived=time.Unix(atomic.LoadInt64(peer.lastReceived), 0
                 p = PeerID()
                 peers.append(p)
@@ -540,8 +507,7 @@ class Network:
 
     def IP(self):
         return self.ip.IP()
-
-    # assumes the stateLock is not held.
+    
     def gossipContainer(self, chainID, containerID, container):
 
         msg = self.b.Put(chainID, constants.GossipMsgRequestID, containerID, container)
@@ -558,7 +524,7 @@ class Network:
 
         s = sampler.NewUniform()
 
-        err = s.Initialize(uint64(len(allPeers)))
+        err = s.Initialize(Uint64(len(allPeers)))
         if err is not None:
             return err
 
@@ -597,9 +563,9 @@ class Network:
         # avaxpython.parallel().go(self.connectTo, ip)
         self.connect_to(peer)
 
-    # assumes the stateLock is not held. Only returns if the ip is connected to or
-    # the network is closed
+    
     def connect_to(self, peer: Peer):        
+        """Only returns if the ip is connected to or the network is closed"""
 
         while True:
 
@@ -616,16 +582,15 @@ class Network:
         n.update(bytes(str(ip), "utf-8"))
         return ShortID(n.digest())
 
-    # assumes the stateLock is not held. Returns nil if a connection was able to be
-    # established, or the network is closed.
+    
     def attempt_connect(self, peer: Peer):
-
+        """Returns None if a connection was able to be established, or the network is closed."""
         self.Log.debug(f"Attempting to connect to {peer.ip}")
 
         conn = self.dialer.Dial(peer.ip)
 
         if conn is None:
-            raise Exception(f"Cannot connect to {peer.ip}")
+            raise RuntimeError(f"Cannot connect to {peer.ip}")
 
         peer.conn = conn
         peer.connected = True
@@ -637,10 +602,9 @@ class Network:
 
         return conn
 
-    # assumes the stateLock is not held. Returns an error if the peer couldn't be
-    # added.
+    
     def tryAddPeer(self, p):
-
+        """Returns an error if the peer couldn't be added."""
         if self.closed:
             raise Exception("Network is closed.")
 
@@ -649,10 +613,9 @@ class Network:
         self.network_handler.peer_state.set_connected(p.id)
         self.num_peers = len(self.peers)
         p.Start()
-
-    # assumes the stateLock is not held. Returns the ips of connections that have
-    # valid IPs that are marked as validators.
+    
     def validatorIPs(self):
+        """Returns the ips of connections that have valid IPs that are marked as validators."""
         self.stateLock.RLock()
         # defer self.stateLock.RUnlock()
 
@@ -661,15 +624,14 @@ class Network:
             ip = peer.getIP()
             if peer.connected.GetValue() and not ip.IsZero() and self.vdrs.Contains(peer.id):
                 peerVersion = (peer.versionStruct.GetValue())(version.Version)
-                if not peerVersion.Before(minimumUnmaskedVersion) or time.Since(n.apricotPhase0Time) < 0:
+                if not peerVersion.Before(minimumUnmaskedVersion) or time.Since(self.apricotPhase0Time) < 0:
                     ips = append(ips, ip)
 
         return ips
 
-    # should only be called after the peer is marked as connected. Should not be
-    # called after disconnected is called with this peer.
-    # assumes the stateLock is not held.
     def connected(self, p):
+        """Should only be called after the peer is marked as connected. 
+        Should not be called after disconnected is called with this peer.    """
         p.net.stateLock.Lock()
         # defer p.net.stateLock.Unlock()
 
@@ -677,7 +639,7 @@ class Network:
 
         peerVersion = (p.versionStruct.GetValue())(version.Version)
 
-        # TODO indentacao quebrada neste setor
+        # TODO 
         if self.hasMasked:
             if peerVersion.Before(minimumUnmaskedVersion):
                 err = self.vdrs.MaskValidator(p.id)
@@ -701,14 +663,13 @@ class Network:
         if not ip.IsZero():
             str = ip.String()
 
-            delete(n.disconnectedIPs, str)
-            delete(n.retryDelay, str)
+            delete(self.disconnectedIPs, str)
+            delete(self.retryDelay, str)
             self.connectedIPs[str] = None
 
         self.router.Connected(p.id)
 
-    # should only be called after the peer is marked as connected.
-    # assumes the stateLock is not held.
+    # should only be called after the peer is marked as connected.    
     def disconnected(self, p):
         p.net.stateLock.Lock()
         # defer p.net.stateLock.Unlock()
@@ -717,14 +678,14 @@ class Network:
 
         self.Log.debug("disconnected from %s at %s", p.id, ip)
 
-        delete(n.peers, p.id)
-        self.num_peers.Set(float64(len(n.peers)))
+        delete(self.peers, p.id)
+        self.num_peers.Set(float64(len(self.peers)))
 
         if not ip.IsZero():
             str = ip.String()
 
-            delete(n.disconnectedIPs, str)
-            delete(n.connectedIPs, str)
+            delete(self.disconnectedIPs, str)
+            delete(self.connectedIPs, str)
 
             self.track(ip)
 
@@ -732,8 +693,6 @@ class Network:
             self.router.Disconnected(p.id)
 
     def getPeers(self, validatorIDs):
-        self.stateLock.RLock()
-        # defer self.stateLock.RUnlock()
 
         if self.closed.GetValue():
             return None
@@ -763,8 +722,7 @@ class Network:
 
         return peers
 
-    # Safe find a single peer
-    # assumes the stateLock is not held.
+    # Safe find a single peer    
     def getPeer(self, validatorID):
         self.stateLock.RLock()
         # defer self.stateLock.RUnlock()
@@ -778,7 +736,7 @@ class Network:
     # to any peers. If the node is not connected to any peers for [disconnectedRestartTimeout],
     # restarts the node.
     def restartOnDisconnect(self):
-        ticker = time.NewTicker(n.disconnectedCheckFreq)
+        ticker = time.NewTicker(self.disconnectedCheckFreq)
         while True:
 
             if readchannel(ticker.C):
@@ -800,7 +758,7 @@ class Network:
                 self.Log.Info("restarting node due to no peers")
                 # go self.restarter.Restart()
 
-            if readchannel(n.connectedCheckerCloser):
+            if readchannel(self.connectedCheckerCloser):
                 ticker.Stop()
                 return
 

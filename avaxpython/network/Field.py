@@ -1,21 +1,28 @@
 # avax-python : Python tools for the exploration of the Avalanche AVAX network.
 #
-# Documentation at https://crypto.bi
+# Find tutorials and use cases at https://crypto.bi
 
 """
 
-Copyright © 2021 ojrdev
+Copyright (C) 2021 - crypto.bi
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-# THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,  DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,  DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+---
+
+Help support this Open Source project!
+Donations address: X-avax1qr6yzjykcjmeflztsgv6y88dl0xnlel3chs3r4
+Thank you!
 
 """
 
 # --#--#--
 
+# See avalanchego/network/commands.go
 
 from avaxpython.utils import nlimits
 from avaxpython.utils.wrappers.Packer import Packer
@@ -36,6 +43,9 @@ class Field:
     ContainerBytes = 10
     ContainerIDs = 11
     MultiContainerBytes = 12
+    SigBytes = 13
+    VersionTime = 14
+    SignedPeers = 15
 
     __op_packer = {
         VersionStr: Packer.TryPackStr,
@@ -51,6 +61,9 @@ class Field:
         ContainerBytes: Packer.TryPackBytes,
         ContainerIDs: Packer.TryPackHashes,
         MultiContainerBytes: Packer.TryPack2DBytes,
+	    SigBytes: Packer.TryPackBytes,
+        VersionTime: Packer.TryPackLong,
+        SignedPeers: Packer.TryPackIPCertList,
     }
 
     __op_unpacker = {
@@ -66,7 +79,10 @@ class Field:
         ContainerID: Packer.TryUnpackHash,
         ContainerBytes: Packer.TryUnpackBytes,
         ContainerIDs: Packer.TryUnpackHashes,
-        MultiContainerBytes: Packer.TryUnpack2DBytes
+        MultiContainerBytes: Packer.TryUnpack2DBytes,
+        SigBytes: Packer.TryUnpackBytes,
+        VersionTime: Packer.TryUnpackLong,
+        SignedPeers: Packer.TryUnpackIPCertList,
     }
 
     __op_string = {
@@ -83,6 +99,9 @@ class Field:
         ContainerBytes: "Container Bytes",
         ContainerIDs: "Container IDs",
         MultiContainerBytes: "MultiContainerBytes",
+        SigBytes: "SigBytes",
+        VersionTime: "VersionTime",
+        SignedPeers: "SignedPeers",
     }
 
     # Packer returns the packer function that can be used to pack this field.
@@ -92,7 +111,7 @@ class Field:
         if field in cls.__op_packer:
             return cls.__op_packer.get(field)
 
-        raise Exception(f"Field {field} not found")
+        raise KeyError(f"Field {field} not found")
 
 
     # Unpacker returns the unpacker function that can be used to unpack this field.
@@ -102,7 +121,7 @@ class Field:
         if field in cls.__op_unpacker:
             return cls.__op_unpacker.get(field)
 
-        raise Exception(f"Field {field} not found")
+        raise KeyError(f"Field {field} not found")
 
 
     @classmethod
@@ -110,5 +129,5 @@ class Field:
         if field in cls.__op_string: 
             return cls.__op_string.get(field)
 
-        raise Exception(f"Field {field} not found")
+        raise KeyError(f"Field {field} not found")
 

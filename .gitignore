@@ -3,6 +3,8 @@
 .idea
 .env
 .vscode
+sample-data/
+loc_scripts/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

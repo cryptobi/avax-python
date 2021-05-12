@@ -1,16 +1,22 @@
 # avax-python : Python tools for the exploration of the Avalanche AVAX network.
 #
-# Documentation at https://crypto.bi
+# Find tutorials and use cases at https://crypto.bi
 
 """
 
-Copyright © 2021 ojrdev
+Copyright (C) 2021 - crypto.bi
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-# THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,  DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,  DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+---
+
+Help support this Open Source project!
+Donations address: X-avax1qr6yzjykcjmeflztsgv6y88dl0xnlel3chs3r4
+Thank you!
 
 """
 
@@ -18,9 +24,12 @@ The above copyright notice and this permission notice shall be included in all c
 
 
 import ipaddress
+from asn1crypto.x509 import Certificate
 from avaxpython.utils.ip import IPDesc
+from avaxpython.utils.ipcert import IPCertDesc
 from avaxpython.utils import nlimits
 from avaxpython.utils.hashing import hashing
+from avaxpython.types import *
 
 
 class Packer:
@@ -31,185 +40,185 @@ class Packer:
     LongLen = 8
     BoolLen = 1
 
-    errBadLength = Exception("packer has insufficient length for input")
-    errNegativeOffset = Exception("negative offset")
-    errInvalidInput = Exception("input does not match expected format")
-    errBadType = Exception("wrong type passed")
-    errBadBool = Exception("unexpected value when unpacking bool")
+    error_bad_length = Exception("packer has insufficient length for input")
+    error_negative_offset = Exception("negative offset")
+    error_invalid_input = Exception("input does not match expected format")
+    error_bad_type = Exception("wrong type passed")
+    error_bad_bool = Exception("unexpected value when unpacking bool")
 
-    def __init__(self, b):
-        self.Bytes = b
+    def __init__(self, b: bytes):
+        self.Bytes: bytes = b
         self.Offset = 0
         self.Errs = []
 
-    def PackByte(p, val):
+    def PackByte(self, val):
 
-        if p.Errored():
+        if self.Errored():
             return
 
-        barr = bytearray(p.Bytes)
+        barr = bytearray(self.Bytes)
         barr.extend(val.to_bytes(1, "big"))
-        p.Bytes = bytes(barr)
-        p.Offset += 1
+        self.Bytes = Bytes(barr)
+        self.Offset += 1
 
-    def UnpackByte(p):
+    def UnpackByte(self):
 
-        if p.Errored():
+        if self.Errored():
             return 0
 
-        endoff = p.Offset + 1
-        val = p.Bytes[p.Offset:endoff]
-        p.Offset += 1
-        return val
+        endoff = self.Offset + 1
+        val = self.Bytes[self.Offset:endoff]
+        self.Offset += 1
+        return Byte(val)
 
-    def PackShort(p, val):
-        if p.Errored():
+    def PackShort(self, val):
+        if self.Errored():
             return
 
-        barr = bytearray(p.Bytes)
+        barr = bytearray(self.Bytes)
         barr.extend(val.to_bytes(Packer.ShortLen, "big"))
-        p.Bytes = bytes(barr)
-        p.Offset += Packer.ShortLen
+        self.Bytes = bytes(barr)
+        self.Offset += Packer.ShortLen
 
-    def UnpackShort(p):
-        if p.Errored():
+    def UnpackShort(self):
+        if self.Errored():
             return 0
 
-        endoff = p.Offset + Packer.ShortLen
-        val = int.from_bytes(p.Bytes[p.Offset:endoff], "big")
-        p.Offset += Packer.ShortLen
-        return val
+        endoff = self.Offset + Packer.ShortLen
+        val = int.from_bytes(self.Bytes[self.Offset:endoff], "big")
+        self.Offset += Packer.ShortLen
+        return Uint16(val)
 
-    def PackInt(p, val):
-        if p.Errored():
+    def PackInt(self, val):
+        if self.Errored():
             return
 
-        barr = bytearray(p.Bytes)
+        barr = bytearray(self.Bytes)
         barr.extend(val.to_bytes(Packer.IntLen, "big"))
-        p.Bytes = bytes(barr)
+        self.Bytes = bytes(barr)
 
-        p.Offset += Packer.IntLen
+        self.Offset += Packer.IntLen
 
         return val
 
-    def UnpackInt(p):
-        if p.Errored():
+    def UnpackInt(self):
+        if self.Errored():
             return 0
 
-        endoff = p.Offset + Packer.IntLen
-        val = int.from_bytes(p.Bytes[p.Offset:endoff], "big")
-        p.Offset += Packer.IntLen
-        return val
+        endoff = self.Offset + Packer.IntLen
+        val = int.from_bytes(self.Bytes[self.Offset:endoff], "big")
+        self.Offset += Packer.IntLen
+        return Uint32(val)
 
-    def PackLong(p, val):
-        if p.Errored():
+    def PackLong(self, val):
+        if self.Errored():
             return
 
-        barr = bytearray(p.Bytes)
+        barr = bytearray(self.Bytes)
         barr.extend(val.to_bytes(Packer.LongLen, "big"))
-        p.Bytes = bytes(barr)
-        p.Offset += Packer.LongLen
+        self.Bytes = bytes(barr)
+        self.Offset += Packer.LongLen
 
         return val
 
-    def UnpackLong(p):
-        if p.Errored():
+    def UnpackLong(self):
+        if self.Errored():
             return 0
 
-        endoff = p.Offset + Packer.LongLen
-        val = int.from_bytes(p.Bytes[p.Offset:endoff], "big")
-        p.Offset += Packer.LongLen
-        return val
+        endoff = self.Offset + Packer.LongLen
+        val = int.from_bytes(self.Bytes[self.Offset:endoff], "big")
+        self.Offset += Packer.LongLen
+        return Uint64(val)
 
-    def PackBool(p, b):
+    def PackBool(self, b):
         if b:
-            p.PackByte(1)
+            self.PackByte(1)
         else:
-            p.PackByte(0)
+            self.PackByte(0)
 
-    def UnpackBool(p):
-        b = p.UnpackByte()
+    def UnpackBool(self):
+        b = self.UnpackByte()
 
         if b == 0:
-            return False
+            return Bool(False)
         elif b == 1:
-            return True
+            return Bool(True)
         else:
-            p.Add(f"Invalid bool {b}")
-            return False
+            self.Add(f"Invalid bool {b}")
+            return Bool(False)
 
-    def PackFixedBytes(p, bbytes):
-        if p.Errored():
+    def PackFixedBytes(self, bbytes):
+        if self.Errored():
             return
 
-        barr = bytearray(p.Bytes)
+        barr = bytearray(self.Bytes)
         barr.extend(bbytes)
-        p.Bytes = bytes(barr)
-        p.Offset += len(bbytes)
+        self.Bytes = bytes(barr)
+        self.Offset += len(bbytes)
 
-    def UnpackFixedBytes(p, size: int):
-        if p.Errored():
+    def UnpackFixedBytes(self, size: int):
+        if self.Errored():
             return None
 
-        bbytes = p.Bytes[p.Offset: p.Offset + size]
-        p.Offset += size
-        return bbytes
+        bbytes = self.Bytes[self.Offset: self.Offset + size]
+        self.Offset += size
+        return Bytes(bbytes)
 
-    def PackBytes(p, dbytes):
-        p.PackInt(int(len(dbytes)))
-        p.PackFixedBytes(dbytes)
+    def PackBytes(self, dbytes):
+        self.PackInt(int(len(dbytes)))
+        self.PackFixedBytes(dbytes)
 
-    def UnpackBytes(p):
-        size = p.UnpackInt()
-        return p.UnpackFixedBytes(int(size))
+    def UnpackBytes(self):
+        size = self.UnpackInt()
+        return self.UnpackFixedBytes(int(size))
 
-    def PackFixedByteSlices(p, byte_slices):
-        p.PackInt(len(byte_slices))
+    def PackFixedByteSlices(self, byte_slices):
+        self.PackInt(len(byte_slices))
         for bbytes in byte_slices:
-            p.PackFixedBytes(bbytes)
+            self.PackFixedBytes(bbytes)
 
-    def UnpackFixedByteSlices(p, size: int):
-        sliceSize = p.UnpackInt()
+    def UnpackFixedByteSlices(self, size: int):
+        sliceSize = self.UnpackInt()
         bbytes = []
         i = int(0)
-        while i < sliceSize and not p.Errored():
-            bts = p.UnpackFixedBytes(size)
+        while i < sliceSize and not self.Errored():
+            bts = self.UnpackFixedBytes(size)
             bbytes.append(bts)
             i += 1
 
-        return bbytes
+        return Bytes(bbytes)
 
-    def Pack2DByteSlice(p, byteSlices):
-        p.PackInt(len(byteSlices))
+    def Pack2DByteSlice(self, byteSlices):
+        self.PackInt(len(byteSlices))
         for bbytes in byteSlices:
-            p.PackBytes(bbytes)
+            self.PackBytes(bbytes)
 
-    def Unpack2DByteSlice(p):
-        sliceSize = p.UnpackInt()
+    def Unpack2DByteSlice(self):
+        slice_size = self.UnpackInt()
         bbytes = []
         i = 0
-        while i < sliceSize and not p.Errored():
-            bts = p.UnpackBytes(sliceSize)
-            bbytes.extend(bts)
+        while i < slice_size and not self.Errored():
+            bts = self.UnpackBytes()
+            bbytes.append(bts)
             i += 1
 
-        return bbytes
+        return Slice(bbytes)
 
-    def PackStr(p, dstr):
-        strSize = len(dstr)
-        if strSize > Packer.MaxStringLen:
-            p.Add(Packer.errInvalidInput)
+    def PackStr(self, dstr):
+        str_size = len(dstr)
+        if str_size > Packer.MaxStringLen:
+            self.Add(Packer.error_invalid_input)
 
-        p.PackShort(strSize)
-        p.PackFixedBytes(bytes(dstr, "utf-8"))
+        self.PackShort(str_size)
+        self.PackFixedBytes(bytes(dstr, "utf-8"))
 
-    def UnpackStr(p):
-        strSize = p.UnpackShort()
-        bts = p.UnpackFixedBytes(int(strSize))
+    def UnpackStr(self):
+        strSize = self.UnpackShort()
+        bts = self.UnpackFixedBytes(int(strSize))
 
-        return bts.decode("utf-8")
+        return String(bts.decode("utf-8"))
 
-    def PackIP(p, ip: IPDesc):
+    def PackIP(self, ip: IPDesc):
         ipto16_a = ip.To16()
 
         barr = bytearray(ipto16_a)
@@ -219,121 +228,183 @@ class Packer:
 
         ipto16 = bytes(barr)
 
-        p.PackFixedBytes(ipto16)
-        p.PackShort(ip.Port)
+        self.PackFixedBytes(ipto16)
+        self.PackShort(ip.Port)
 
-    def UnpackIP(p):
-        ipbytes = p.UnpackFixedBytes(16)
+    def UnpackIP(self):
+        ipbytes = self.UnpackFixedBytes(16)
         ipa = None
         if ipbytes[-6] == 0xff and ipbytes[-5] == 0xff:
             ipa = ipaddress.IPv4Address(ipbytes[-4:])            
         else:
             ipa = ipaddress.IPv6Address(ipbytes)            
 
-        port = p.UnpackShort()
+        port = self.UnpackShort()
         return IPDesc(IP=str(ipa), Port=port)
 
-    def PackIPs(p, ips):
-        p.PackInt(len(ips))
+    def PackIPs(self, ips):
+        self.PackInt(len(ips))
         i = 0
-        while i < len(ips) and not p.Errored():
-            p.PackIP(ips[i])
+        while i < len(ips) and not self.Errored():
+            self.PackIP(ips[i])
             i += 1
 
-    def UnpackIPs(p):
-        sliceSize = p.UnpackInt()        
+    def UnpackIPs(self):
+        sliceSize = self.UnpackInt()        
         ips = []
         i = 0
-        while i < sliceSize and not p.Errored():
-            ips.append(p.UnpackIP())
+        while i < sliceSize and not self.Errored():
+            ips.append(self.UnpackIP())
             i += 1
+
+        return Slice(ips)
+
+    def TryPackByte(self, valIntf):
+        self.PackByte(valIntf)
+
+    def TryUnpackByte(self):
+        return self.UnpackByte()
+
+    def TryPackShort(self, valIntf):
+        self.PackShort(valIntf)
+
+    def TryUnpackShort(self):
+        return self.UnpackShort()
+
+    def TryPackInt(self, valIntf):
+        self.PackInt(valIntf)
+
+    def TryUnpackInt(self):
+        return self.UnpackInt()
+
+    def TryPackLong(self, valIntf):
+        self.PackLong(valIntf)
+
+    def TryUnpackLong(self):
+        return self.UnpackLong()
+
+    def TryPackHash(self, valIntf):
+        self.PackFixedBytes(valIntf)
+
+    def TryUnpackHash(self):
+        return self.UnpackFixedBytes(hashing.HashLen)
+
+    def TryPackHashes(self, valIntf):
+        self.PackFixedByteSlices(valIntf)
+
+    def TryUnpackHashes(self):
+        return self.UnpackFixedByteSlices(hashing.HashLen)
+
+    def TryPackAddr(self, valIntf):
+        self.PackFixedBytes(valIntf)
+
+    def TryUnpackAddr(self):
+        return self.UnpackFixedBytes(hashing.AddrLen)
+
+    def TryPackAddrList(self, valIntf):
+        self.PackFixedByteSlices(valIntf)
+
+    def TryUnpackAddrList(self):
+        return self.UnpackFixedByteSlices(hashing.AddrLen)
+
+    def TryPackBytes(self, valIntf):
+        self.PackBytes(valIntf)
+
+    def TryUnpackBytes(self):
+        return self.UnpackBytes()
+
+    def TryPack2DBytes(self, valIntf):
+        self.Pack2DByteSlice(valIntf)
+
+    def TryUnpack2DBytes(self):
+        return self.Unpack2DByteSlice()
+
+    def TryPackStr(self, valIntf):
+        self.PackStr(valIntf)
+
+    def TryUnpackStr(self):
+        return self.UnpackStr()
+
+    def TryPackIP(self, valIntf):
+        self.PackIP(valIntf)
+
+    def TryUnpackIP(self):
+        return self.UnpackIP()
+
+    def TryPackIPList(self, valIntf):
+        self.PackIPs(valIntf)
+
+    def TryUnpackIPList(self):
+        return self.UnpackIPs()
+
+    def Errored(self):
+        return len(self.Errs) > 0
+
+    def Add(self, errors):
+        for e in errors:
+            self.Errs.append(e)
+
+    def TryPackX509Certificate(self, valIntf):
+        if isinstance(valIntf, Certificate):    
+            self.PackX509Certificate(valIntf)
+        else:
+            self.Add(Packer.error_bad_type)
+
+    def TryUnpackX509Certificate(self):
+        return self.UnpackX509Certificate()
+
+    def PackX509Certificate(self, cert: Certificate):        
+        self.PackBytes(cert.dump())
+    
+    def UnpackX509Certificate(self) -> Certificate:
+        b = self.UnpackBytes()
+        if len(b) == 0:
+            return None
+                
+        cert = Certificate.load(b)
+        if cert is None:
+            self.Add(Exception("Error Parsing X509 Cert"))            
+            return None
+
+        return cert    
+
+    def TryPackIPCert(self, valIntf):
+        if isinstance(valIntf, IPCertDesc):        
+            self.PackIPCert(valIntf)
+        else:
+            self.Add(Packer.error_bad_type)        
+    
+    def TryUnpackIPCert(self):
+        return self.UnpackIPCert()
+    
+    def PackIPCert(self, ipCert: IPCertDesc):
+        self.PackX509Certificate(ipCert.Cert)
+        self.PackIP(ipCert.IPDesc)
+        self.PackLong(ipCert.Time)
+        self.PackBytes(ipCert.Signature)
+    
+    def UnpackIPCert(self) -> IPCertDesc:
+        ipCert = IPCertDesc()
+        ipCert.Cert = self.UnpackX509Certificate()
+        ipCert.IPDesc = self.UnpackIP()
+        ipCert.Time = self.UnpackLong()
+        ipCert.Signature = self.UnpackBytes()
+        return ipCert    
+
+    def TryPackIPCertList(self, valIntf):
+        if isinstance(valIntf[0], IPCertDesc):        
+            self.PackInt(Uint32(len(valIntf)))
+            for ipc in IPCertDesc:
+                self.PackIPCert(ipc)
+        else:
+            self.Add(Packer.error_bad_type)
+
+    def TryUnpackIPCertList(self):
+        slice_size = self.UnpackInt()
+        ips = []
+        for i in range(slice_size):
+            ips.append(self.UnpackIPCert())
 
         return ips
 
-    def TryPackByte(packer, valIntf):
-        packer.PackByte(val)
 
-    def TryUnpackByte(packer):
-        return packer.UnpackByte()
-
-    def TryPackShort(packer, valIntf):
-        packer.PackShort(valIntf)
-
-    def TryUnpackShort(packer):
-        return packer.UnpackShort()
-
-    def TryPackInt(packer, valIntf):
-        packer.PackInt(valIntf)
-
-    def TryUnpackInt(packer):
-        return packer.UnpackInt()
-
-    def TryPackLong(packer, valIntf):
-        packer.PackLong(valIntf)
-
-    def TryUnpackLong(packer):
-        return packer.UnpackLong()
-
-    def TryPackHash(packer, valIntf):
-        packer.PackFixedBytes(valIntf)
-
-    def TryUnpackHash(packer):
-        return packer.UnpackFixedBytes(hashing.HashLen)
-
-    def TryPackHashes(packer, valIntf):
-        packer.PackFixedByteSlices(valIntf)
-
-    def TryUnpackHashes(packer):
-        return packer.UnpackFixedByteSlices(hashing.HashLen)
-
-    def TryPackAddr(packer, valIntf):
-        packer.PackFixedBytes(valIntf)
-
-    def TryUnpackAddr(packer):
-        return packer.UnpackFixedBytes(hashing.AddrLen)
-
-    def TryPackAddrList(packer, valIntf):
-        packer.PackFixedByteSlices(valIntf)
-
-    def TryUnpackAddrList(packer):
-        return packer.UnpackFixedByteSlices(hashing.AddrLen)
-
-    def TryPackBytes(packer, valIntf):
-        packer.PackBytes(valIntf)
-
-    def TryUnpackBytes(packer):
-        return packer.UnpackBytes()
-
-    def TryPack2DBytes(packer, valIntf):
-        packer.Pack2DByteSlice(valIntf)
-
-    def TryUnpack2DBytes(packer):
-        return packer.Unpack2DByteSlice()
-
-    def TryPackStr(packer, valIntf):
-        packer.PackStr(valIntf)
-
-    def TryUnpackStr(packer):
-        return packer.UnpackStr()
-
-    def TryPackIP(packer, valIntf):
-        packer.PackIP(valIntf)
-
-    def TryUnpackIP(packer):
-        return packer.UnpackIP()
-
-    def TryPackIPList(packer, valIntf):
-        packer.PackIPs(valIntf)
-
-    def TryUnpackIPList(packer):
-        return packer.UnpackIPs()
-
-    def Errored(packer):
-        return len(packer.Errs) > 0
-
-    def Add(packer, errors):
-        for e in errors:
-            packer.Errs.append(e)
-
-    def Bytes(self):
-        return self.Bytes

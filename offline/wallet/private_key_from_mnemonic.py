@@ -8,6 +8,9 @@
 
 Copyright © 2021 ojrdev
 
+Support this Open Source project!
+Donate to X-avax1qr6yzjykcjmeflztsgv6y88dl0xnlel3chs3r4
+
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
@@ -35,8 +38,9 @@ from mnemonic import Mnemonic
 from avaxpython.wallet import generator, BIP32
 from avaxpython.wallet import Config as WalletConfig
 from avaxpython import Config
+from avaxpython.utils.formatting.encoding import Encoding
 from bip_utils import Bip32
-import cb58ref
+import  ref
 import json
 
 sample_wallet = next(generator.generate(1, Config.KEY_SIZE))
@@ -58,9 +62,12 @@ masterKey = masterHdKey.PrivateKey().Raw().ToBytes()
 accountKey = accountHdKey.PrivateKey().Raw().ToBytes()
 firstKey = firstHDKey.PrivateKey().Raw().ToBytes()
 
-masterKeyEncoded = "PrivateKey-{}".format(cb58ref.cb58encode(masterKey))
-accountKeyEncoded = "PrivateKey-{}".format(cb58ref.cb58encode(accountKey))
-firstKeyEncoded = "PrivateKey-{}".format(cb58ref.cb58encode(firstKey))
+enc = Encoding()
+pkey_prefix = "PrivateKey-{}"
+
+masterKeyEncoded = pkey_prefix.format(enc.Encode(masterKey))
+accountKeyEncoded = pkey_prefix.format(enc.Encode(accountKey))
+firstKeyEncoded = pkey_prefix.format(enc.Encode(firstKey))
 
 output = {
     'masterHdKeyEncoded' : masterKeyEncoded,

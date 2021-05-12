@@ -1,0 +1,10 @@
+numpy
+pyopenssl
+cryptography
+asn1crypto
+plyvel
+TatSu
+mnemonic
+py-crypto-hd-wallet
+bip-utils
+pysha3

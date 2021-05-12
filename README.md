@@ -4,7 +4,16 @@ A Python library and utils for the exploration of the [Avalanche AVAX](https://c
 
 Includes an implementation of basic AVAX API calls, offline wallet generator and other utilities.
 
-Visit the [crypto.bi AVAX section](https://crypto.bi/category/avax/) for code samples and tutorials.
+
+## Documentation and Tutorials
+
+* [avax-python – Python utils for AVAX cryptocurrency and Avalanche network exploration](https://crypto.bi/avax-python/)
+* [avax-python Implementation Notes](https://crypto.bi/avax-python-notes/)
+* [avax-python Network Message Pipeline](https://crypto.bi/avax-python-messages/)
+* [Scrape AVAX network peers using avax-python](https://crypto.bi/list-avax-peers/)
+* [Generate AVAX addresses and keys from a mnemonic phrase in Python](https://crypto.bi/avax-mnemonic-python/)
+
+Visit the [crypto.bi AVAX section](https://crypto.bi/category/avax/) for up to date samples and tutorials.
 
 
 ## Requirements
@@ -12,6 +21,8 @@ Visit the [crypto.bi AVAX section](https://crypto.bi/category/avax/) for code sa
     sudo pip3 install numpy
     sudo pip3 install pyopenssl
     sudo pip3 install cryptography
+    sudo pip3 install asn1crypto
+    sudo pip3 install plyvel
 
 If you plan on generating the python files from `api.specification`, then `spec2py.py` requires `TatSu`
 
@@ -197,8 +208,6 @@ This project includes source code from :
 [bech32 Encoding under wallet/bech32](https://github.com/sipa/bech32) : by Pieter Wuille, License unspecified, MIT License Presumed
 
 
-
-
 ## Legal Notices
 
 Avalanche and AVAX are registered trademarks of Ava Labs Inc.
@@ -207,6 +216,18 @@ Avalanche and AVAX are registered trademarks of Ava Labs Inc.
 
 This free open source software provided for Avalanche AVAX learning and exploration purposes. No warranty is offered, express or implied, as to the suitability or correctness of this code. **Cryptocurrency transactions are irreversible.** We are not responsible for losses incurred during the use of this software.
 
+
 ## Sponsor
 
-Development of `avax-python` is sponsored by **[crypto.bi](https://crypto.bi/)**
+Development of `avax-python` is partly sponsored by **[crypto.bi](https://crypto.bi/)**
+
+Please help support this Open Source project!
+
+Donate to `X-avax1qr6yzjykcjmeflztsgv6y88dl0xnlel3chs3r4`
+
+
+
+
+---
+
+*From Snowflake to Avalanche. Per consensum ad astra.*
