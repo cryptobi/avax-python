@@ -62,4 +62,4 @@ class AVAXConf:
 
 Bip44AVAXMainNet = Bip44Coin(coin_conf  = AVAXConf,
                                 is_testnet = False,
-                                addr_fct   = P2PKH)
+                                addr_cls   = P2PKH)
